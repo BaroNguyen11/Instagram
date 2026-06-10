@@ -1,3 +1,4 @@
+const User = require('../models/User');
 const generateToken = require('../utils/generateToken')
 
 let users = [];
@@ -19,10 +20,10 @@ const register = (req, res) => {
   res.json({ message: "Register success" });
 };
 
-const login = (req, res) => {
+const login = async (req, res) => {
   const { username, password } = req.body;
 
-  const user = users.find(u => u.username === username);
+  const user =  await User.findOne({ username });
 
   if (!user || user.password !== password) {
     return res.status(401).json({ message: "Invalid credentials" });

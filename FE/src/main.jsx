@@ -8,23 +8,28 @@ import Message from './page/message/Message.jsx'
 import Notify from './page/notify/Notify.jsx'
 import UploadPost from './page/upload/UploadPost.jsx'
 import Profile from './page/profile/Profile.jsx'
-import Search from './page/search/Search.jsx'
+import SearchPage from './page/search/SearchPage.jsx'
 import Explore from './page/explore/Explore.jsx'
+import Login from './page/auth/Login.jsx'
+import { AuthProvider } from './context/AuthContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
       <Routes>
         <Route path='/' element={<App />} >
             <Route index element={<Homepage />} />
             <Route path="/messages" element={<Message />} />
-            <Route path="/search" element={<Search />} />
+            <Route path="/search" element={<SearchPage />} />
             <Route path="/explore" element={<Explore />} />
             <Route path="/notifications" element={<Notify />} />
             <Route path="/create" element={<UploadPost />} />
             <Route path="/profile" element={<Profile />} />
         </Route>
+        <Route path="/login" element={<Login />} />
       </Routes>
     </BrowserRouter>
+    </AuthProvider>
   </StrictMode>,
 )

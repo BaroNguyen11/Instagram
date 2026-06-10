@@ -9,7 +9,6 @@ const usePost = () => {
     const fetchPost = async () => {
       const res = await fetch("http://localhost:8080/posts");
       const data = await res.json();
-
       setPosts(data);
     };
     fetchPost();
@@ -31,7 +30,7 @@ const usePost = () => {
   const displayPost = useMemo(()=>{
     return posts.filter((p)=>{
       const searchLower = searchKeyword.toLowerCase()
-      const matchKeyword = p.title?.toLowerCase().includes(searchLower)
+      const matchKeyword = p.caption?.toLowerCase().includes(searchLower)
 
       return matchKeyword
     })
