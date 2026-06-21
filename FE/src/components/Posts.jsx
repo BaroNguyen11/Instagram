@@ -45,14 +45,16 @@ const Posts = ({ posts }) => {
                 <MoreHorizontal size={20} />
               </div>
             </div>
-            <div className="mt-4 bg-gray-800 p-4 rounded-md h-128 ">
-              <p className="text-gray-300 overflow-hidden h-full items-center flex justify-center">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
-                vel sapien eget nunc gravida tincidunt. Sed ut perspiciatis unde
-                omnis iste natus error sit voluptatem accusantium doloremque
-                laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore
-                veritatis et quasi architecto beatae vitae dicta sunt explicabo.
-              </p>
+            <div className="mt-4 bg-zinc-900 rounded-md overflow-hidden flex items-center justify-center h-128">
+              {post.images?.[0]?.url ? (
+                <img
+                  src={post.images[0].url}
+                  alt={post.caption}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <p className="text-gray-500">Không có hình ảnh</p>
+              )}
             </div>
             <div className="flex items-center mt-2">
               <div className="flex items-center gap-4 mt-2">

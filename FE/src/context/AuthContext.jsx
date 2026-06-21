@@ -1,19 +1,15 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
+import { authService } from "../services/authService";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
-
   useEffect(() => {
     const token = localStorage.getItem("token");
 
     if (token) {
-      const decoded = jwtDecode(token);
-
-      setUser(decoded);
       setIsAuthenticated(true);
     }
 
@@ -22,36 +18,17 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const res = await fetch("http://localhost:8080/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username,
-          password,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message);
-      }
-
+      const data = await authService.login(username,password)
       localStorage.setItem("token", data.token);
 
       setIsAuthenticated(true);
-      const decoded = jwtDecode(data.token);
-      console.log(decoded);
-      setUser(decoded);
       return {
         success: true,
       };
     } catch (err) {
       return {
         success: false,
-        message: err.message,
+        message: err.response?.data?.message || err.message,
       };
     }
   };
@@ -61,14 +38,14 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
   };
 
+ 
   return (
     <AuthContext.Provider
       value={{
         isAuthenticated,
         loading,
         login,
-        logout,
-        user,
+        logout
       }}
     >
       {children}

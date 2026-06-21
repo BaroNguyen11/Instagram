@@ -1,18 +1,23 @@
 const Post = require("../models/Post");
-require("../models/User"); 
+require("../models/User");
 const { getUsers } = require("./authController");
 let posts = [];
-const createPost = (req, res) => {
-  const newPost = {
-    id: Date.now(),
-    title: req.body.title,
-    content: req.body.content,
-    author: req.user.username,
-    likes: [],
-    createdAt: new Date(),
-  };
-  posts.push(newPost);
-  res.json(newPost);
+const createPost = async (req, res) => {
+  try {
+    const images = req.files ? req.files.map(file => ({
+      url: `http://localhost:${process.env.PORT || 8080}/uploads/${file.filename}`,
+    })) : [];
+
+    const post = await Post.create({
+      author: req.user._id,
+      caption: req.body.caption,
+      images: images,
+    });
+
+    res.status(201).json(post);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
 
 const getAllPosts = async (req, res) => {
@@ -21,9 +26,8 @@ const getAllPosts = async (req, res) => {
       .populate("author", "username avatar")
       .sort({ createdAt: -1 });
     res.json(posts);
-   
   } catch (err) {
-    res.status.json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 const getPostById = (req, res) => {

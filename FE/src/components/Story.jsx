@@ -6,7 +6,7 @@ const Story = () => {
     " rounded-full object-cover bg-black cursor-pointer block transition-all duration-200 w-full h-full border-4 border-black";
   const storyStyle =
     " p-1 rounded-full w-24 h-24 shrink-0 flex items-center justify-center ";
-  const nameStyle = "text-xs mt-1 text-gray-400 truncate w-20 text-center";
+  const nameStyle = "text-xs mt-1 text-gray-400 truncate w-20 text-center ";
   const style = "flex flex-col items-center min-w-[6rem]";
   const data = [
     {
@@ -64,7 +64,7 @@ const Story = () => {
         </div>
         <div className="flex space-x-7 overflow-x-hidden " ref={scrollRef}>
           {data.map((item) => (
-            <div className={style}>
+            <div className={style} key={item.id}>
               <div className={` ${storyStyle} ${item.active ? "bg-linear-[45deg] from-[#f6ff00] via-[#f15130] to-[#ca09bf]" : "bg-[#3a3a3a]"}`}>
                 <img src={item.img} alt="" className={imageStyle} />
               </div>

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
+import { userService } from "../services/userService";
 
 const useUsers = () => {
   const [user, setUser] = useState([]);
   useEffect(() => {
     const fetchData = async () => {
-      const res = await fetch("http://localhost:8080/users");
-      const data = await res.json();
+      const data = await userService.getAllUsers()
       setUser(data);
     };
     fetchData()

@@ -4,6 +4,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors')
 const connectDB = require("./config/db");
+const path = require("path");
 
 const authRoutes = require('./routes/authRoutes')
 const commentRoutes = require('./routes/commentRoutes')
@@ -13,6 +14,7 @@ const userRoutes = require('./routes/userRoutes')
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
 
 connectDB();
 

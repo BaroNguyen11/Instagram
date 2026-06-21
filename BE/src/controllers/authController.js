@@ -1,23 +1,26 @@
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken')
 
-let users = [];
 
-const register = (req, res) => {
-  console.log(req.body);
-  const { username, password } = req.body;
-  if (!username || !password) {
-    return res.status(400).json({ message: "Missing fields" });
+const register = async (req, res) => {
+  try {
+    console.log(req.body);
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({ message: "Missing fields" });
+    }
+    const exist = await User.findOne({ username });
+
+    if (exist) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
+    await User.create({ username, password });
+
+    res.json({ message: "Register success" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
-  const exist = users.find(u => u.username === username);
-
-  if (exist) {
-    return res.status(400).json({ message: "User already exists" });
-  }
-
-  users.push({ username, password });
-
-  res.json({ message: "Register success" });
 };
 
 const login = async (req, res) => {
@@ -34,13 +37,20 @@ const login = async (req, res) => {
   res.json({ token });
 };
 
-const getUsers = (req, res) => {
-  return res.json(users)
+const getUsers = async (req, res) => {
+    try {
+      const users = await User.find()
+      return res.json(users)
+    } catch (err) {
+      return res.status(500).json({
+        message: err.message
+      })
+    }
 }
 const getProfile = (req, res) => {
   res.json({
     message: "Profile data",
-    user: req.user
+    User: req.user
   });
 };
 module.exports = { register, login, getUsers,getProfile };

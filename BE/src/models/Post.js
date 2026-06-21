@@ -5,7 +5,7 @@ const postSchema = new mongoose.Schema(
     author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      require: true,
+      required: true,
     },
     caption: {
       type: String,
@@ -18,7 +18,6 @@ const postSchema = new mongoose.Schema(
         height: Number,
       },
     ],
-    location: String,
     likeCount: {
       type: Number,
       default: 0,
