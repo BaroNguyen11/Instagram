@@ -2,16 +2,55 @@ const Post = require("../models/Post");
 require("../models/User");
 const { getUsers } = require("./authController");
 let posts = [];
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const crypto = require("crypto");
+
+const s3Client = new S3Client({
+  region: "auto",
+  endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  credentials: {
+    accessKeyId: process.env.R2_ACCESS_KEY_ID,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+  },
+});
+
 const createPost = async (req, res) => {
   try {
-    const images = req.files ? req.files.map(file => ({
-      url: `http://localhost:${process.env.PORT || 8080}/uploads/${file.filename}`,
-    })) : [];
+    const images = [];
 
+    // Nếu có file được gửi lên từ multer
+    if (req.files && req.files.length > 0) {
+      // Chạy vòng lặp qua từng file để upload lên Cloudflare R2
+      const uploadPromises = req.files.map(async (file) => {
+        // Tạo tên file duy nhất để tránh trùng lặp trên R2
+        const uniqueFilename = `${Date.now()}-${crypto.randomBytes(4).toString("hex")}-${file.originalname}`;
+
+        const uploadParams = {
+          Bucket: process.env.R2_BUCKET_NAME,
+          Key: uniqueFilename, // Tên file lưu trên R2
+          Body: file.buffer, // Dữ liệu binary của file từ RAM
+          ContentType: file.mimetype, // Định dạng ảnh (image/jpeg, image/png...)
+        };
+
+        // Thực thi lệnh upload lên R2
+        await s3Client.send(new PutObjectCommand(uploadParams));
+
+        // Trả về URL public truy cập ảnh
+        return {
+          url: `${process.env.R2_PUBLIC_URL}/${uniqueFilename}`,
+        };
+      });
+
+      // Đợi tất cả các file upload thành công
+      const uploadedImages = await Promise.all(uploadPromises);
+      images.push(...uploadedImages);
+    }
+
+    // Tạo post trong Database với các URL ảnh mới từ R2
     const post = await Post.create({
       author: req.user._id,
       caption: req.body.caption,
-      images: images,
+      images: images, // mảng chứa các { url: "https://..." }
     });
 
     res.status(201).json(post);

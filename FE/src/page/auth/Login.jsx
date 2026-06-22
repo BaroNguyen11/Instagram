@@ -8,16 +8,35 @@ const Login = () => {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-
-  const handleSubmit = async (e)=>{
+  const [styleUsername, setStyleUsername] = useState("");
+  const [stylePassword, setStylePassword] = useState("");
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await login(username,password)
-    if (res.success){
-        navigate("/")
-    }else{
-        alert(res.message)
+    const res = await login(username, password);
+    if (res.success) {
+      navigate("/");
+    } else {
+      alert(res.message);
     }
-  }
+  };
+  const handleChangeUsername = (e) => {
+    const value = e.target.value;
+    setUsername(value);
+    if (value !== "") {
+      setStyleUsername("-translate-y-3.5 text-sm");
+    } else {
+      setStyleUsername("");
+    }
+  };
+  const handleChangePassword = (e) => {
+    const value = e.target.value;
+    setPassword(value);
+    if (value !== "") {
+      setStylePassword("-translate-y-3.5 text-sm");
+    } else {
+      setStylePassword("");
+    }
+  };
   const inputStyle =
     "w-full bg-[rgba(255,255,255,0.1)] text-white rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500 ";
   return (
@@ -39,9 +58,11 @@ const Login = () => {
                   type="text"
                   className={inputStyle}
                   value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={handleChangeUsername}
                 />
-                <span className="absolute left-4 top-3.5 text-gray-400 group-focus-within:-translate-y-3.5 group-focus-within:text-sm  duration-300 transition-all ease-in-out">
+                <span
+                  className={`absolute left-4 top-3.5 text-gray-400 group-focus-within:-translate-y-3.5 group-focus-within:text-sm  duration-300 transition-all ease-in-out ${styleUsername}`}
+                >
                   Username
                 </span>
               </div>
@@ -50,9 +71,9 @@ const Login = () => {
                   type="password"
                   className={inputStyle}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={handleChangePassword}
                 />
-                <span className="absolute left-4 top-3.5 text-gray-400 group-focus-within:-translate-y-3.5 group-focus-within:text-sm  duration-300 transition-all ease-in-out">
+                <span className={`absolute left-4 top-3.5 text-gray-400 group-focus-within:-translate-y-3.5 group-focus-within:text-sm  duration-300 transition-all ease-in-out ${stylePassword}`}>
                   Password
                 </span>
               </div>
