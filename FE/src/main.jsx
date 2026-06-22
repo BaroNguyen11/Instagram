@@ -40,11 +40,11 @@ createRoot(document.getElementById("root")).render(
             <Route path="/create" element={<UploadPost />} />
             <Route path="/profile" element={<Profile />}>
               <Route index element={<ProfilePosts />} />
-              <Route path="saved" element={<ProfileSaved />}>
-                <Route path="all-posts" element={<ProfileAllPosts />} />
-              </Route>
+              <Route path="saved" element={<ProfileSaved />} />
+              
               <Route path="tagged" element={<ProfileTagged />} />
             </Route>
+            <Route path="profile/saved/all-posts" element={<ProfileAllPosts />} />
           </Route>
           <Route path="/login" element={<Login />} />
         </Routes>

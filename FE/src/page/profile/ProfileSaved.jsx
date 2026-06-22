@@ -24,7 +24,7 @@ const ProfileSaved = () => {
             </div>
           </Link>
         )}
-        <Outlet />
+     
       </div>
     </>
   );
