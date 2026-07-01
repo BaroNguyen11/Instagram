@@ -17,6 +17,7 @@ import ProfileSaved from "./page/profile/ProfileSaved.jsx";
 import ProfilePosts from "./page/profile/ProfilePosts.jsx";
 import ProfileTagged from "./page/profile/ProfileTagged.jsx";
 import ProfileAllPosts from "./page/profile/ProfileAllPosts.jsx";
+import Register from "./page/auth/Register.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -47,6 +48,7 @@ createRoot(document.getElementById("root")).render(
             <Route path="profile/saved/all-posts" element={<ProfileAllPosts />} />
           </Route>
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

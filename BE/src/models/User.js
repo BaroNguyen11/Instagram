@@ -12,7 +12,6 @@ const userSchema = new mongoose.Schema(
 
     email: {
       type: String,
-      required: true,
       unique: true,
     },
 
@@ -24,6 +23,10 @@ const userSchema = new mongoose.Schema(
     avatar: String,
 
     bio: String,
+    refreshToken: {
+      type: String,
+      default: null,
+    },
   },
   {
     timestamps: true,

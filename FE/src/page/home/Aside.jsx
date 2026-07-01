@@ -15,7 +15,7 @@ const Aside = () => {
             <div className="flex items-center justify-between gap-4 mb-4">
               <div className="flex items-center gap-4 mb-4">
                 <img
-                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFBo6bythwEPQHLVrQUDTLl-bVfJ4MnxRDWQ&s"
+                  src={profile?.User?.avatar}
                   alt=""
                   className="w-10 h-10 rounded-full"
                 />

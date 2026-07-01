@@ -19,7 +19,8 @@ export const AuthProvider = ({ children }) => {
   const login = async (username, password) => {
     try {
       const data = await authService.login(username,password)
-      localStorage.setItem("token", data.token);
+      localStorage.setItem("token", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
 
       setIsAuthenticated(true);
       return {
@@ -33,9 +34,33 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    setIsAuthenticated(false);
+  const register = async (username, password) => {
+    try {
+      const data = await authService.register(username,password)
+      return {
+        success: true,
+      };
+    } catch (err) {
+      return {
+        success: false,
+        message: err.response?.data?.message || err.message,
+      };
+    }
+  };
+
+  const logout = async () => {
+    try {
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (refreshToken) {
+        await authService.logout(refreshToken);
+      }
+    } catch (err) {
+      console.error("Logout error:", err);
+    } finally {
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      setIsAuthenticated(false);
+    }
   };
 
  
@@ -45,6 +70,7 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated,
         loading,
         login,
+        register,
         logout
       }}
     >

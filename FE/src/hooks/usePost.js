@@ -10,7 +10,6 @@ const usePost = () => {
   const fetchPost = useCallback(async () => {
     try {
       const data = await postService.getAllPosts();
-      console.log(data);
       setPosts(data);
     } catch (err) {
       console.error("Error fetching posts:", err);

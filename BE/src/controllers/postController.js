@@ -26,7 +26,7 @@ const createPost = async (req, res) => {
         const uniqueFilename = `${Date.now()}-${crypto.randomBytes(4).toString("hex")}-${file.originalname}`;
 
         const uploadParams = {
-          Bucket: process.env.R2_BUCKET_NAME,
+          Bucket: process.env.R2_BUCKET_POST,
           Key: uniqueFilename, // Tên file lưu trên R2
           Body: file.buffer, // Dữ liệu binary của file từ RAM
           ContentType: file.mimetype, // Định dạng ảnh (image/jpeg, image/png...)

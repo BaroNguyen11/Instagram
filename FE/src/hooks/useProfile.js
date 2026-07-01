@@ -16,6 +16,7 @@ const useProfile = () => {
 
       try {
         const data = await authService.getProfile()
+
         setProfile(data);
       } catch (err) {
         console.error(err);
