@@ -10,7 +10,7 @@ const authRoutes = require('./routes/authRoutes')
 const commentRoutes = require('./routes/commentRoutes')
 const postRoutes = require('./routes/postRoutes')
 const userRoutes = require('./routes/userRoutes')
-
+const profileRoutes = require('./routes/profileRoutes')
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -24,6 +24,7 @@ app.use('/auth', authRoutes)
 app.use('/comments', commentRoutes)
 app.use('/posts', postRoutes)
 app.use('/users', userRoutes)
+app.use('/profile', profileRoutes)
 
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);

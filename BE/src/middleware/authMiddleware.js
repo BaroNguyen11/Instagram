@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
-const protect = (req, res, next) => {
+const protect = async (req, res, next) => {
   const authHeaders = req.headers.authorization;
 
   if (!authHeaders) {
@@ -9,7 +10,15 @@ const protect = (req, res, next) => {
   const token = authHeaders.split(" ")[1]
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || "secret123");
-    req.user = decoded;
+    const user = await User.findById(decoded._id).select("-password -refreshToken");
+
+if (!user) {
+  return res.status(401).json({
+    message: "User not found",
+  });
+}
+
+req.user = user;
     next();
   } catch (err) {
     return res.status(401).json({ message: "Invalid or expired token" });

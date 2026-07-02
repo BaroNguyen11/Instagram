@@ -18,7 +18,10 @@ import ProfilePosts from "./page/profile/ProfilePosts.jsx";
 import ProfileTagged from "./page/profile/ProfileTagged.jsx";
 import ProfileAllPosts from "./page/profile/ProfileAllPosts.jsx";
 import Register from "./page/auth/Register.jsx";
-
+import Settings from "./page/edit/Settings.jsx";
+import EditProfile from "./page/edit/EditProfile.jsx";
+import Notifications from "./page/edit/Notifications.jsx";
+document.documentElement.classList.add("dark");
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <AuthProvider>
@@ -42,10 +45,16 @@ createRoot(document.getElementById("root")).render(
             <Route path="/profile" element={<Profile />}>
               <Route index element={<ProfilePosts />} />
               <Route path="saved" element={<ProfileSaved />} />
-              
               <Route path="tagged" element={<ProfileTagged />} />
             </Route>
-            <Route path="profile/saved/all-posts" element={<ProfileAllPosts />} />
+            <Route
+              path="profile/saved/all-posts"
+              element={<ProfileAllPosts />}
+            />
+            <Route path="/settings" element={<Settings />}>
+              <Route path="edit" element={<EditProfile />} />
+              <Route path="notifications" element={<Notifications />} />
+            </Route>
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

@@ -1,12 +1,14 @@
 import { Camera, Plus } from "lucide-react";
 import useProfile from "../../hooks/useProfile";
 import Menu from "./Menu";
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import { useState } from "react";
 import apiClient from "../../api/apiClient";
+import toast from "react-hot-toast";
 
 const Profile = () => {
   const { profile } = useProfile();
+  console.log("profile", profile);
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const handleAvatarChange = async (e) => {
@@ -18,8 +20,6 @@ const Profile = () => {
     formData.append("avatar", file);
     try {
       setIsUploading(true);
-
-      // Gọi API bằng apiClient để tự động quản lý Authorization Header & Refresh Token
       const response = await apiClient.post("/users/upload-avatar", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -28,12 +28,11 @@ const Profile = () => {
 
       const data = response.data;
 
-      // 4. Thành công: Thông báo hoặc cập nhật lại state profile (tùy thuộc vào hook useProfile của bạn)
-      alert("Đã cập nhật ảnh đại diện thành công!");
+      toast.success("Đã cập nhật ảnh đại diện thành công!");
     } catch (error) {
-      console.error("Lỗi khi upload avatar:", error);
-      alert("Có lỗi xảy ra, vui lòng thử lại!");
-      setAvatarPreview(null); // Gặp lỗi thì xóa preview, quay về ảnh cũ
+      console.log("Lỗi khi upload avatar:", error);
+      toast.error("Có lỗi xảy ra, vui lòng thử lại!");
+      setAvatarPreview(null); 
     } finally {
       setIsUploading(false);
     }
@@ -42,7 +41,6 @@ const Profile = () => {
     avatarPreview ||
     profile?.User?.avatar ||
     "https://scontent.cdninstagram.com/v/t51.89012-19/573323465_1219825463302212_7278921664109726296_n.jpg?stp=dst-jpg_tt6&_nc_cat=1&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy5DMyJ9&_nc_ohc=_zrBf_yIeLcQ7kNvwFGrj0I&_nc_oc=Adosinr6K_o-xcoY62Agpa0Aw2_beJtShTp_fh7O_bIdCYpjy75HhhqRq83jwrhOFqRQfPwFOu3kX6MN4jOD3wRs&_nc_zt=24&_nc_ht=scontent.cdninstagram.com&_nc_gid=6RkWY1QbU0u1d3i-WrdxnA&_nc_ss=7b6a8&oh=00_AQBJOSRO0Qk3ksGfEIs2G-YnwtpMfvL73TwFTpbKOXTE3Q&oe=6A4AFEE2";
-  console.log("Profile data:", profile?.User?.avatar);
   return (
     <>
       <div className="flex justify-center">
@@ -79,23 +77,25 @@ const Profile = () => {
               </div>
               <div className="flex items-center gap-3">
                 <span>
-                  {" "}
-                  <b>0</b> posts
+                  <b>{profile?.User?.postsCount || 0}</b> posts
                 </span>
                 <span>
-                  <b>36k</b> followers
+                  <b>{profile?.User?.followersCount || 0}</b> followers
                 </span>
                 <span>
-                  <b>18k</b> following
+                  <b>{profile?.User?.followingCount || 0}</b> following
                 </span>
               </div>
-              <span>yêu đơn phương liệu có tốt?</span>
+              <span>{profile?.User?.bio || "No bio available"}</span>
             </div>
           </div>
           <div className="flex gap-4">
-            <button className="bg-[rgba(256,256,256,0.15)] w-full py-2.5 rounded-lg cursor-pointer hover:bg-[rgba(256,256,256,0.25)] transition-all duration-200">
+            <Link
+              to="/settings/edit"
+              className="bg-[rgba(256,256,256,0.15)] flex justify-center items-center w-full py-2.5 rounded-lg cursor-pointer hover:bg-[rgba(256,256,256,0.25)] transition-all duration-200"
+            >
               Edit profile
-            </button>
+            </Link>
             <button className="bg-[rgba(256,256,256,0.15)] w-full py-2.5 rounded-lg cursor-pointer hover:bg-[rgba(256,256,256,0.25)] transition-all duration-200">
               View archive
             </button>

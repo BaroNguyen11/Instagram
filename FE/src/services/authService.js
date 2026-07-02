@@ -1,5 +1,4 @@
 import apiClient from "../api/apiClient";
-import axios from "axios";
 
 export const authService = {
     login: async (username,password) => {

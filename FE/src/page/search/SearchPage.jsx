@@ -15,7 +15,7 @@ const SearchPage = () => {
         type="text"
         ref={searchRef}
         placeholder="Search"
-        className="block w-150 text-sm p-2.5 mx-auto px-8 rounded-full bg-[rgba(255,255,255,0.1)] text-white focus:outline-none "
+        className="block w-150 text-sm p-2.5 mx-auto px-9 rounded-full bg-[rgba(255,255,255,0.1)] text-white focus:outline-none "
         value={search}
         onChange={(e) => {
           const value = e.target.value;
