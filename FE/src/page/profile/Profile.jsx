@@ -1,14 +1,16 @@
 import { Camera, Plus } from "lucide-react";
 import useProfile from "../../hooks/useProfile";
 import Menu from "./Menu";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useOutletContext } from "react-router-dom";
 import { useState } from "react";
 import apiClient from "../../api/apiClient";
 import toast from "react-hot-toast";
 
 const Profile = () => {
   const { profile } = useProfile();
-  console.log("profile", profile);
+  const context = useOutletContext();
+  const { posts } = context || { posts: [] };
+  const myPosts = posts.filter((post) => post.author?._id === profile?.User?._id);
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const handleAvatarChange = async (e) => {
@@ -32,11 +34,12 @@ const Profile = () => {
     } catch (error) {
       console.log("Lỗi khi upload avatar:", error);
       toast.error("Có lỗi xảy ra, vui lòng thử lại!");
-      setAvatarPreview(null); 
+      setAvatarPreview(null);
     } finally {
       setIsUploading(false);
     }
   };
+
   const currentAvatar =
     avatarPreview ||
     profile?.User?.avatar ||
@@ -72,12 +75,12 @@ const Profile = () => {
                   {profile?.User?.username}
                 </div>
                 <div className="text-md text-gray-400 ">
-                  {profile?.User?.fullname}
+                  {profile?.User?.fullName}
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <span>
-                  <b>{profile?.User?.postsCount || 0}</b> posts
+                  <b>{myPosts.length}</b> posts
                 </span>
                 <span>
                   <b>{profile?.User?.followersCount || 0}</b> followers
@@ -121,7 +124,7 @@ const Profile = () => {
             </div>
           </div>
           <Menu />
-          <Outlet />
+          <Outlet context={context} />
         </div>
       </div>
     </>

@@ -5,6 +5,6 @@ const { protect } = require('../middleware/authMiddleware')
 const {updateProfile} = require('../controllers/profileController')
 
 
-router.put('/', protect,updateProfile)
+router.patch('/', protect,updateProfile)
 
 module.exports = router

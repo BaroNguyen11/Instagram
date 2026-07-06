@@ -29,7 +29,7 @@ const Sidebar = () => {
           </span>
           <Link
             to="/settings/edit"
-            className={`flex items-center mt-2 text-sm font-semibold hover:bg-[rgba(255,255,255,0.1)] p-2 rounded-lg transition-all duration-200 ${activeLink === 'edit' ? 'bg-[rgba(255,255,255,0.08)]' : ''}`}
+            className={`flex items-center mt-2 text-sm font-semibold hover:bg-[rgba(255,255,255,0.1)] p-2 rounded-md transition-all duration-200 ${activeLink === 'edit' ? 'bg-[rgba(255,255,255,0.08)]' : ''}`}
             onClick={() => handleLinkClick('edit')}
           >
             <User size={16} className="inline-block mr-2" />
@@ -37,7 +37,7 @@ const Sidebar = () => {
           </Link>
           <Link
             to="/settings/notifications"
-            className={`flex items-center mt-2 text-sm font-semibold hover:bg-[rgba(255,255,255,0.1)] p-2 rounded-lg transition-all duration-200 ${activeLink === 'notifications' ? 'bg-[rgba(255,255,255,0.08)]' : ''}`}
+            className={`flex items-center mt-2 text-sm font-semibold hover:bg-[rgba(255,255,255,0.1)] p-2 rounded-md transition-all duration-200 ${activeLink === 'notifications' ? 'bg-[rgba(255,255,255,0.08)]' : ''}`}
             onClick={() => handleLinkClick('notifications')}
           >
             <Bell size={16} className="inline-block mr-2" />

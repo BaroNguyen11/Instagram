@@ -1,10 +1,17 @@
 import Posts from "../../components/Posts";
 
 
-const MainContent = ({ posts }) => {
+const MainContent = ({ posts, refetchPosts, page, setPage, hasMore, loading }) => {
   return (
     <>
-      <Posts posts={posts} />
+      <Posts
+        posts={posts}
+        refetchPosts={refetchPosts}
+        page={page}
+        setPage={setPage}
+        hasMore={hasMore}
+        loading={loading}
+      />
     </>
   );
 };

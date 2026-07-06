@@ -6,7 +6,7 @@ import useUsers from "../../hooks/useUsers";
 const Aside = () => {
   const { isAuthenticated } = useAuth();
   const { profile } = useProfile();
-  const  user  = useUsers();
+  const user = useUsers();
   return (
     <>
       <aside className="hidden lg:block w-90 py-10 px-8">
@@ -23,7 +23,7 @@ const Aside = () => {
                   <div className="font-bold text-sm">
                     {profile?.User?.username}
                   </div>
-                  <div className="text-sm text-gray-400 ">{profile?.User?.fullname}</div>
+                  <div className="text-sm text-gray-400 ">{profile?.User?.fullName}</div>
                 </div>
               </div>
               <button className="text-blue-300 text-xs font-bold cursor-pointer">
@@ -37,8 +37,8 @@ const Aside = () => {
               See All
             </button>
           </div>
-          {user.map((item)=>(
-             <div className="flex items-center justify-between gap-2 mb-1" key={item.id}>
+          {user.map((item) => (
+            <div className="flex items-center justify-between gap-2 mb-1" key={item._id}>
               <div className="flex items-center gap-4 mb-4">
                 <img
                   src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFBo6bythwEPQHLVrQUDTLl-bVfJ4MnxRDWQ&s"
@@ -54,7 +54,7 @@ const Aside = () => {
                 Follow
               </button>
             </div>
-         ))}
+          ))}
         </div>
       </aside>
     </>

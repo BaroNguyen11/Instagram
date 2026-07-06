@@ -1,15 +1,5 @@
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
-const crypto = require("crypto");
 const User = require("../models/User");
-
-const s3Client = new S3Client({
-    region: "auto",
-    endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
-    credentials: {
-        accessKeyId: process.env.R2_ACCESS_KEY_ID,
-        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
-    },
-});
+const r2Service = require("../services/r2.service");
 
 const uploadAvt = async (req, res) => {
     try {
@@ -17,20 +7,28 @@ const uploadAvt = async (req, res) => {
             return res.status(400).json({ message: "No file uploaded" });
         }
 
-        const file = req.file;
-        const uniqueFilename = `${Date.now()}-${crypto.randomBytes(4).toString("hex")}-${file.originalname}`;
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
 
-        const uploadParams = {
-            Bucket: process.env.R2_BUCKET_AVT,
-            Key: uniqueFilename, // Tên file lưu trên R2
-            Body: file.buffer, // Dữ liệu binary của file từ RAM
-            ContentType: file.mimetype, // Định dạng ảnh (image/jpeg, image/png...)
-        };
+        // Delete old avatar from R2 if it exists and is stored on R2
+        if (user.avatar && user.avatar.includes(process.env.R2_PUBLIC_URL_AVATAR)) {
+            try {
+                await r2Service.deleteFromR2(user.avatar, process.env.R2_BUCKET_AVT);
+            } catch (r2Error) {
+                console.error("Failed to delete old avatar from R2:", r2Error);
+            }
+        }
 
-        // Thực thi lệnh upload lên R2
-        await s3Client.send(new PutObjectCommand(uploadParams));
+        // Upload new avatar using the service
+        const uploadResult = await r2Service.uploadToR2(
+            req.file,
+            process.env.R2_BUCKET_AVT,
+            process.env.R2_PUBLIC_URL_AVATAR
+        );
 
-        const avatarUrl = `${process.env.R2_PUBLIC_URL_AVATAR}/${uniqueFilename}`;
+        const avatarUrl = uploadResult.url;
 
         // Cập nhật avatar của user trong Database
         const updateAvatar = await User.updateOne(

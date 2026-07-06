@@ -13,14 +13,15 @@ import Explore from "./page/explore/Explore.jsx";
 import Login from "./page/auth/Login.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
-import ProfileSaved from "./page/profile/ProfileSaved.jsx";
-import ProfilePosts from "./page/profile/ProfilePosts.jsx";
-import ProfileTagged from "./page/profile/ProfileTagged.jsx";
-import ProfileAllPosts from "./page/profile/ProfileAllPosts.jsx";
+import ProfileSaved from "./page/profile/Saved/ProfileSaved.jsx";
+import ProfilePosts from "./page/profile/Posts/ProfilePosts.jsx";
+import ProfileTagged from "./page/profile/Tagged/ProfileTagged.jsx";
+import ProfileAllPosts from "./page/profile/Saved/ProfileAllPosts.jsx";
 import Register from "./page/auth/Register.jsx";
 import Settings from "./page/edit/Settings.jsx";
 import EditProfile from "./page/edit/EditProfile.jsx";
-import Notifications from "./page/edit/Notifications.jsx";
+import Notifications from "./page/edit/Notifications/Notifications.jsx";
+import PushNotifications from "./page/edit/Notifications/PushNotifications";
 document.documentElement.classList.add("dark");
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -54,6 +55,11 @@ createRoot(document.getElementById("root")).render(
             <Route path="/settings" element={<Settings />}>
               <Route path="edit" element={<EditProfile />} />
               <Route path="notifications" element={<Notifications />} />
+              {/* <Route path="email-notifications" element={<EmailNotifications />} /> */}
+              <Route
+                path="push-notifications"
+                element={<PushNotifications />}
+              />
             </Route>
           </Route>
           <Route path="/login" element={<Login />} />

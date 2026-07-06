@@ -1,69 +1,72 @@
 import { createPortal } from "react-dom";
-import { ArrowLeft, X } from "lucide-react";
+import { ArrowLeft, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import useProfile from "../../hooks/useProfile";
 import { postService } from "../../services/postService";
+import toast from "react-hot-toast";
 
 const ModalUpload = ({ onClose, refetchPosts }) => {
   const [step, setStep] = useState(1);
-  const [file, setFile] = useState(null);
-  const [preview, setPreview] = useState(null);
+  const [files, setFiles] = useState([]);
+  const [previews, setPreviews] = useState([]);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [caption, setCaption] = useState("");
 
   const { profile } = useProfile();
 
   const handleFileChange = (e) => {
-    const selectedFile = e.target.files?.[0];
+    const selectedFiles = Array.from(e.target.files || []);
 
-    if (!selectedFile) return;
+    if (selectedFiles.length === 0) return;
 
-    const url = URL.createObjectURL(selectedFile);
+    if (selectedFiles.length > 10) {
+      toast.error("You can select up to 10 images.");
+      return;
+    }
 
-    setFile(selectedFile);
-    setPreview(url);
+    const urls = selectedFiles.map((file) => URL.createObjectURL(file));
+
+    setFiles(selectedFiles);
+    setPreviews(urls);
+    setActiveIndex(0);
     setStep(2);
   };
 
   const handleBackToSelect = () => {
-    if (preview) {
-      URL.revokeObjectURL(preview);
-    }
+    previews.forEach((url) => URL.revokeObjectURL(url));
 
-    setFile(null);
-    setPreview(null);
+    setFiles([]);
+    setPreviews([]);
+    setActiveIndex(0);
     setCaption("");
     setStep(1);
   };
 
   const handleCreatePost = async () => {
-    if (!file) return;
+    if (files.length === 0) return;
     try {
       const formData = new FormData();
       formData.append("caption", caption);
-      formData.append("images", file);
+      files.forEach((file) => {
+        formData.append("images", file);
+      });
 
       await postService.createPost(formData);
-      if (refetchPosts) {
-        await refetchPosts();
-      }
+      await refetchPosts();
       onClose();
+      toast.success("Post created successfully!");
     } catch (err) {
       console.error(err);
+      toast.error("Failed to create post. Please try again.");
     }
   };
-
   const modalSize =
-    step === 3
-      ? "max-w-[800px] h-[560px]"
-      : "max-w-[550px] h-[650px]";
+    step === 3 ? "max-w-[800px] h-[560px]" : "max-w-[550px] h-[620px]";
 
   return createPortal(
     <div className="fixed inset-0 z-9999 flex items-center justify-center px-4">
       {/* Overlay */}
-      <div
-        className="absolute inset-0 bg-black/80"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-black/80" onClick={onClose} />
 
       {/* Close */}
       <button
@@ -103,6 +106,7 @@ const ModalUpload = ({ onClose, refetchPosts }) => {
                 type="file"
                 id="fileInput"
                 className="hidden"
+                multiple
                 accept="image/*,video/*"
                 onChange={handleFileChange}
               />
@@ -121,10 +125,7 @@ const ModalUpload = ({ onClose, refetchPosts }) => {
         {step === 2 && (
           <>
             <div className="h-12 border-b border-[#363636] flex items-center justify-between px-4 text-white font-semibold">
-              <button
-                onClick={handleBackToSelect}
-                className="cursor-pointer"
-              >
+              <button onClick={handleBackToSelect} className="cursor-pointer">
                 <ArrowLeft />
               </button>
 
@@ -138,19 +139,53 @@ const ModalUpload = ({ onClose, refetchPosts }) => {
               </button>
             </div>
 
-            <div className="flex-1 bg-black flex items-center justify-center">
-              {file?.type.startsWith("video/") ? (
+            <div className="flex-1 bg-black flex items-center justify-center relative group/carousel">
+              {files[activeIndex]?.type.startsWith("video/") ? (
                 <video
-                  src={preview}
+                  src={previews[activeIndex]}
                   controls
                   className="max-w-full max-h-full object-contain"
                 />
               ) : (
                 <img
-                  src={preview}
+                  src={previews[activeIndex]}
                   alt="preview"
                   className="max-w-full max-h-full object-contain"
                 />
+              )}
+
+              {/* Prev Button */}
+              {activeIndex > 0 && (
+                <button
+                  onClick={() => setActiveIndex((prev) => prev - 1)}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/80 text-white p-2 rounded-full cursor-pointer transition-colors z-10"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+              )}
+
+              {/* Next Button */}
+              {activeIndex < previews.length - 1 && (
+                <button
+                  onClick={() => setActiveIndex((prev) => prev + 1)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/80 text-white p-2 rounded-full cursor-pointer transition-colors z-10"
+                >
+                  <ChevronRight size={20} />
+                </button>
+              )}
+
+              {/* Dots indicator */}
+              {previews.length > 1 && (
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+                  {previews.map((_, idx) => (
+                    <span
+                      key={idx}
+                      className={`w-1.5 h-1.5 rounded-full transition-all ${
+                        idx === activeIndex ? "bg-[#0095f6] scale-125" : "bg-gray-400/60"
+                      }`}
+                    />
+                  ))}
+                </div>
               )}
             </div>
           </>
@@ -160,10 +195,7 @@ const ModalUpload = ({ onClose, refetchPosts }) => {
         {step === 3 && (
           <>
             <div className="h-12 border-b border-[#363636] flex items-center justify-between px-4 text-white font-semibold">
-              <button
-                onClick={() => setStep(2)}
-                className="cursor-pointer"
-              >
+              <button onClick={() => setStep(2)} className="cursor-pointer">
                 <ArrowLeft />
               </button>
 
@@ -179,19 +211,53 @@ const ModalUpload = ({ onClose, refetchPosts }) => {
 
             <div className="flex flex-1 overflow-hidden">
               {/* Left */}
-              <div className="flex-1 bg-black flex items-center justify-center">
-                {file?.type.startsWith("video/") ? (
+              <div className="flex-1 bg-black flex items-center justify-center relative group/carousel">
+                {files[activeIndex]?.type.startsWith("video/") ? (
                   <video
-                    src={preview}
+                    src={previews[activeIndex]}
                     controls
                     className="max-w-full max-h-full object-contain"
                   />
                 ) : (
                   <img
-                    src={preview}
+                    src={previews[activeIndex]}
                     alt="preview"
                     className="max-w-full max-h-full object-contain"
                   />
+                )}
+
+                {/* Prev Button */}
+                {activeIndex > 0 && (
+                  <button
+                    onClick={() => setActiveIndex((prev) => prev - 1)}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/80 text-white p-2 rounded-full cursor-pointer transition-colors z-10"
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+                )}
+
+                {/* Next Button */}
+                {activeIndex < previews.length - 1 && (
+                  <button
+                    onClick={() => setActiveIndex((prev) => prev + 1)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/80 text-white p-2 rounded-full cursor-pointer transition-colors z-10"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                )}
+
+                {/* Dots indicator */}
+                {previews.length > 1 && (
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+                    {previews.map((_, idx) => (
+                      <span
+                        key={idx}
+                        className={`w-1.5 h-1.5 rounded-full transition-all ${
+                          idx === activeIndex ? "bg-[#0095f6] scale-125" : "bg-gray-400/60"
+                        }`}
+                      />
+                    ))}
+                  </div>
                 )}
               </div>
 
@@ -217,9 +283,7 @@ const ModalUpload = ({ onClose, refetchPosts }) => {
 
                 <textarea
                   value={caption}
-                  onChange={(e) =>
-                    setCaption(e.target.value)
-                  }
+                  onChange={(e) => setCaption(e.target.value)}
                   placeholder="Write a caption..."
                   maxLength={2200}
                   className="flex-1 px-4 py-2 bg-transparent text-white resize-none outline-none placeholder:text-gray-500"
@@ -234,7 +298,7 @@ const ModalUpload = ({ onClose, refetchPosts }) => {
         )}
       </div>
     </div>,
-    document.body
+    document.body,
   );
 };
 

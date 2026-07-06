@@ -26,6 +26,22 @@ app.use('/posts', postRoutes)
 app.use('/users', userRoutes)
 app.use('/profile', profileRoutes)
 
+// Global error handling middleware
+app.use((err, req, res, next) => {
+  console.error("Global Error Handler:", err.message);
+  
+  if (err.code === "LIMIT_FILE_SIZE") {
+    return res.status(400).json({ message: "File is too large. Maximum size allowed is 10MB." });
+  }
+  
+  if (err.message && err.message.includes("Invalid file type")) {
+    return res.status(400).json({ message: err.message });
+  }
+
+  return res.status(500).json({ message: err.message || "Internal Server Error" });
+});
+
+
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
 });

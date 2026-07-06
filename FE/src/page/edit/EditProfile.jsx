@@ -1,6 +1,6 @@
 import { Search } from "lucide-react";
 import useProfile from "../../hooks/useProfile";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/select";
 import { updateProfile } from "../../services/profileService";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 const EditProfile = () => {
   const { profile } = useProfile();
   const [bio, setBio] = useState("");
@@ -18,6 +19,20 @@ const EditProfile = () => {
   const [birthDate, setBirthDate] = useState("");
   const [gender, setGender] = useState("");
   const [websiteError, setWebsiteError] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!profile?.User) return;
+
+    setWebsite(profile.User.website || "");
+    setBio(profile.User.bio || "");
+    setFullName(profile.User.fullName || "");
+    setGender(profile.User.gender || "");
+
+    setBirthDate(
+      profile.User.birthDate ? profile.User.birthDate.slice(0, 10) : "",
+    );
+  }, [profile]);
 
   const isValidWebsite = (value) => {
     if (!value) return true;
@@ -46,20 +61,25 @@ const EditProfile = () => {
     if (websiteError) return;
 
     try {
-        const data = {
-            bio,
-            website,
-            fullName,
-            birthDate,
-            gender,
-        };
-        const response = await updateProfile(data);
+      const data = {
+        bio,
+        website,
+        fullName,
+        birthDate,
+        gender,
+      };
+      await updateProfile(data);
 
-        toast.success("Profile updated successfully!");
+      toast.success("Profile updated successfully!");
+      setTimeout(() => {
+        navigate(`/profile`);
+      }, 1000);
     } catch (error) {
-        toast.error("An error occurred while updating the profile. Please try again.");
+      toast.error(
+        "An error occurred while updating the profile. Please try again.",
+      );
     }
-  }
+  };
   return (
     <>
       <div className="max-w-180 mx-auto py-10">
@@ -77,7 +97,7 @@ const EditProfile = () => {
                   {profile?.User?.username}
                 </div>
                 <div className="text-sm text-gray-400 ">
-                  {profile?.User?.fullname}
+                  {profile?.User?.fullName}
                 </div>
               </div>
             </div>
@@ -112,7 +132,7 @@ const EditProfile = () => {
             onChange={(e) => setBio(e.target.value)}
             maxLength={150}
             className="resize-none text-sm placeholder:text-gray-400 border border-gray-600 focus:outline-none focus:border-gray-400 transition-all duration-150 block w-full p-3 rounded-lg mt-2 h-20 text-white"
-            placeholder="Tell us about yourself..."
+            placeholder="No bio available"
           />
 
           <div
@@ -128,7 +148,7 @@ const EditProfile = () => {
             <h3 className="font-bold text-lg">Full Name</h3>
             <input
               type="text"
-              placeholder={profile?.User?.fullname || "Full Name"}
+              placeholder="Full Name"
               className="border border-gray-600 focus:outline-none focus:border-gray-400 transition-all duration-150 block w-full px-3 py-2 rounded-sm mt-2  text-white text-sm"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
@@ -154,13 +174,13 @@ const EditProfile = () => {
             </SelectTrigger>
 
             <SelectContent position="popper">
-              <SelectItem value="male">Male</SelectItem>
-              <SelectItem value="female">Female</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
+              <SelectItem value="Male">Male</SelectItem>
+              <SelectItem value="Female">Female</SelectItem>
+              <SelectItem value="Other">Other</SelectItem>
             </SelectContent>
           </Select>
         </div>
-        <button 
+        <button
           className="bg-blue-600 w-full text-xs font-bold cursor-pointer mt-10 px-5 py-2.5 rounded-md hover:bg-blue-700 transition-all duration-200"
           onClick={handleSubmit}
         >

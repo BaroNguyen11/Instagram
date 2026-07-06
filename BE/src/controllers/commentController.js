@@ -1,57 +1,149 @@
-const { posts } = require('./postController')
+const Comment = require("../models/Comment");
+const CommentLike = require("../models/commentLike");
 
-let comments = []
+const Post = require("../models/Post");
+const User = require("../models/User");
 
-const createComment = (req, res) => {
-  const postId = parseInt(req.params.id)
-  const post = posts.find(p => p.id === postId)
+const createComment = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const post = await Post.findById(postId);
+    console.log(postId)
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
 
-  if (!post) {
-    return res.status(404).json({ message: "Post not found" })
+    const comment = await Comment.create({
+      post: postId,
+      user: req.user._id,
+      content: req.body.content,
+    });
+
+    // Cập nhật số lượng comment trên bài viết
+    post.commentCount = (post.commentCount || 0) + 1;
+    await post.save();
+
+    await comment.populate("user", "username avatar");
+    return res.status(201).json(comment);
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
   }
+};
 
-  const newComment = {
-    id: Date.now(),
-    postId: postId,
-    content: req.body.content,
-    author: req.user.username,
-    createdAt: new Date()
+const updateComment = async (req, res) => {
+  try {
+    const commentId = req.params.id;
+
+    const comment = await Comment.findById(commentId).populate(
+      "user",
+      "username avatar",
+    );
+
+    if (!comment) {
+      return res.status(404).json({
+        message: "Comment not found",
+      });
+    }
+
+    const liked = await CommentLike.findOne({
+      comment: commentId,
+      user: req.user._id,
+    });
+
+    let isLiked;
+
+    if (liked) {
+      await liked.deleteOne();
+
+      comment.likeCounts = Math.max(0, comment.likeCounts - 1);
+
+      isLiked = false;
+    } else {
+      await CommentLike.create({
+        comment: commentId,
+        user: req.user._id,
+      });
+
+      comment.likeCounts++;
+
+      isLiked = true;
+    }
+
+    await comment.save();
+
+    return res.json({
+      ...comment.toObject(),
+      liked: isLiked,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: err.message,
+    });
   }
-  comments.push(newComment)
-  res.json(newComment)
-}
+};
 
-const getComment = (req, res) => {
-  const id = parseInt(req.params.id)
+const deleteComment = async (req, res) => {
+  try {
+    const comment = await Comment.findById(req.params.id);
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
 
-  const commentId = comments.findIndex(c => c.id === id)
-  if (commentId === -1) {
-    return res.status(404).json({ message: "Comment not found" })
+    if (comment.user.toString() !== req.user._id.toString()) {
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to delete this comment" });
+    }
+
+    await Comment.findByIdAndDelete(req.params.id);
+
+    // Giảm số lượng comment trên bài viết
+    const post = await Post.findById(comment.post);
+    if (post) {
+      post.commentCount = Math.max(0, (post.commentCount || 0) - 1);
+      await post.save();
+    }
+
+    return res.json({
+      message: "Delete comment successful",
+      data: comment,
+    });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
   }
-  res.json(comments[commentId])
-}
+};
 
-const deleteComment = (req, res) => {
-  const id = parseInt(req.params.id)
+const getCommentsByPost = async (req, res) => {
+  try {
+    const postId = req.params.postId;
 
-  const commentIndex = comments.findIndex(c => c.id === id)
-  if (commentIndex === -1) {
-    return res.status(404).json({ message: "Comment not found" })
+    const comments = await Comment.find({ post: postId })
+      .populate("user", "username avatar")
+      .sort({ createdAt: 1 });
+
+    // lấy tất cả comment mà user hiện tại đã like
+    const likes = await CommentLike.find({
+      user: req.user._id,
+      comment: {
+        $in: comments.map((c) => c._id),
+      },
+    });
+    // chuyển sang Set để tìm kiếm O(1)
+    const likedIds = new Set(likes.map((like) => like.comment.toString()));
+
+    return res.json(
+      comments.map((c) => ({
+        ...c.toObject(),
+        liked: likedIds.has(c._id.toString()),
+      })),
+    );
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
   }
-  if (comments[commentIndex].author !== req.user.username) {
-    return res.status(403).json({ message: "you are not the author" })
-  }
-  const deletedComment = comments[commentIndex]
-  comments.splice(commentIndex, 1)
-  return res.json({
-    message: "delete comment successful",
-    data: deletedComment
-  })
-}
-const getCommentsByPost = (req, res) => {
-  const postId = parseInt(req.params.id)
-
-  const result = comments.filter(c => c.postId === postId)
-  res.json(result)
-}
-module.exports = { createComment, getComment, deleteComment, getCommentsByPost }
+};
+module.exports = {
+  createComment,
+  updateComment,
+  deleteComment,
+  getCommentsByPost,
+};

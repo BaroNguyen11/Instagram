@@ -9,14 +9,20 @@ const {
   getPostById,
   updatePost,
   deletePost,
+  toggleLike,
+  savePosts
 } = require("../controllers/postController");
 const upload = require("../middleware/upload");
+
+
 router.post("/", protect, upload.array("images", 10), createPost);
-router.get("/", getAllPosts);
 
 router.use(protect);
+router.get("/", getAllPosts);
 
 router.get("/:id", getPostById);
 router.put("/:id", updatePost);
 router.delete("/:id", deletePost);
+router.patch("/:id/liked", toggleLike);
+router.patch("/:id/saved", savePosts);
 module.exports = router;

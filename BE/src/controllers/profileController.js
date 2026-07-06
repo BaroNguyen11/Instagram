@@ -12,15 +12,17 @@ const updateProfile = async (req, res) => {
     }
     const updateData = {};
 
-    if (username !== undefined) updateData.username = username;
-    if (fullName !== undefined) updateData.fullName = fullName;
-    if (gender !== undefined) updateData.gender = gender;
+    if (username?.trim()) updateData.username = username.trim();
+    if (fullName?.trim()) updateData.fullName = fullName.trim();
+    if (website?.trim()) updateData.website = website.trim();
+    if (bio?.trim()) updateData.bio = bio.trim();
+
+    // if (gender !== undefined) updateData.gender = gender;
     if (birthDate !== undefined) updateData.birthDate = birthDate;
-    if (website !== undefined) updateData.website = website;
-    if (bio !== undefined) updateData.bio = bio;
-    
+
     const updatedProfile = await User.findByIdAndUpdate(userId, updateData, {
       new: true,
+      select: "-password -refreshToken",
     });
     if (!updatedProfile) {
       return res.status(404).json({
@@ -29,7 +31,7 @@ const updateProfile = async (req, res) => {
     }
     return res.status(200).json(updatedProfile);
   } catch (error) {
-      console.error(error);
+    console.error(error);
     return res
       .status(500)
       .json({ message: "Có lỗi xảy ra, vui lòng thử lại!" });
