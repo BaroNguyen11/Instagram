@@ -17,16 +17,26 @@ export const postService = {
     const response = await apiClient.delete(`/posts/${postId}`);
     return response.data;
   },
- getAllPosts: async (page = 1, limit = 10) => {
-  const res = await apiClient.get("/posts", {
-    params: {
-      page,
-      limit,
-    },
-  });
+  getAllPosts: async (page = 1, limit = 10) => {
+    const res = await apiClient.get("/posts", {
+      params: {
+        page,
+        limit,
+      },
+    });
 
-  return res.data;
-},
+    return res.data;
+  },
+  getPostsByUser: async (id, page = 1, limit = 10) => {
+    const res = await apiClient.get(`/posts/user/${id}`, {
+      params: {
+        page,
+        limit,
+      },
+    });
+
+    return res.data;
+  },
   getPostById: async (postId) => {
     const response = await apiClient.get(`/posts/${postId}`);
     return response.data;
@@ -38,5 +48,5 @@ export const postService = {
   savedPost: async (id) => {
     const response = await apiClient.patch(`/posts/${id}/saved`);
     return response.data;
-}
+  },
 };

@@ -2,11 +2,31 @@ import { useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import useProfile from "../../hooks/useProfile";
 import useUsers from "../../hooks/useUsers";
+import { userService } from "@/services/userService";
 
 const Aside = () => {
   const { isAuthenticated } = useAuth();
   const { profile } = useProfile();
-  const user = useUsers();
+  const { users, setUsers } = useUsers();
+  const user = users.filter((follow) => follow.isFollowing === false);
+  const handleFollow = async (id) => {
+    try {
+      const data = await userService.toggleFollow(id);
+
+      setUsers((prev) =>
+        prev.map((user) =>
+          user._id === id
+            ? {
+                ...user,
+                isFollowing: data.following,
+              }
+            : user,
+        ),
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <>
       <aside className="hidden lg:block w-90 py-10 px-8">
@@ -23,7 +43,9 @@ const Aside = () => {
                   <div className="font-bold text-sm">
                     {profile?.User?.username}
                   </div>
-                  <div className="text-sm text-gray-400 ">{profile?.User?.fullName}</div>
+                  <div className="text-sm text-gray-400 ">
+                    {profile?.User?.fullName}
+                  </div>
                 </div>
               </div>
               <button className="text-blue-300 text-xs font-bold cursor-pointer">
@@ -38,7 +60,10 @@ const Aside = () => {
             </button>
           </div>
           {user.map((item) => (
-            <div className="flex items-center justify-between gap-2 mb-1" key={item._id}>
+            <div
+              className="flex items-center justify-between gap-2 mb-1"
+              key={item._id}
+            >
               <div className="flex items-center gap-4 mb-4">
                 <img
                   src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFBo6bythwEPQHLVrQUDTLl-bVfJ4MnxRDWQ&s"
@@ -50,8 +75,11 @@ const Aside = () => {
                   <div className="text-gray-400 text-xs">Suggest for you</div>
                 </div>
               </div>
-              <button className="text-blue-400 text-xs font-bold cursor-pointer">
-                Follow
+              <button
+                className="text-blue-400 text-xs font-bold cursor-pointer"
+                onClick={() => handleFollow(item._id)}
+              >
+                {item.isFollowing ? "Following" : "Follow"}
               </button>
             </div>
           ))}

@@ -27,11 +27,11 @@ const PostImageCarousel = ({ images, caption }) => {
         style={{ transform: `translate3d(-${activeIndex * 100}%, 0, 0)` }}
       >
         {images.map((img, idx) => (
-          <div key={idx} className="min-w-full h-full flex-shrink-0 flex items-center justify-center bg-zinc-900">
+          <div key={idx} className="min-w-full h-full shrink-0 flex items-center justify-center bg-zinc-900">
             <img
               src={img.url}
               alt={`${caption || "post"} ${idx}`}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
             />
           </div>
         ))}

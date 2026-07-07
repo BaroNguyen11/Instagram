@@ -12,7 +12,6 @@ const userSchema = new mongoose.Schema(
 
     email: {
       type: String,
-      unique: true,
     },
 
     password: {
@@ -36,6 +35,25 @@ const userSchema = new mongoose.Schema(
     birthDate: {
       type: Date,
       default: null,
+    },
+    isPrivate: {
+      type: Boolean,
+      default: false,
+    },
+
+    followersCount: {
+      type: Number,
+      default: 0,
+    },
+
+    followingCount: {
+      type: Number,
+      default: 0,
+    },
+
+    postsCount: {
+      type: Number,
+      default: 0,
     },
   },
   {

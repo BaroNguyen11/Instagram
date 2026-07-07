@@ -1,3 +1,4 @@
+const Follow = require("../models/Following");
 const User = require("../models/User");
 const {
   generateAccessToken,
@@ -94,7 +95,10 @@ const refreshToken = async (req, res) => {
     if (!refreshToken) {
       return res.status(400).json({ message: "Missing refresh token" });
     }
-    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+    const decoded = jwt.verify(
+      refreshToken,
+      process.env.JWT_REFRESH_SECRET || "refresh_secret_456",
+    );
     const user = await User.findById(decoded._id);
     if (!user || user.refreshToken !== refreshToken) {
       return res.status(403).json({ message: "Invalid refresh token" });
@@ -108,14 +112,91 @@ const refreshToken = async (req, res) => {
 
 const getUsers = async (req, res) => {
   try {
-    const users = await User.find();
-    return res.json(users);
+    const users = await User.find({
+      _id: { $ne: req.user._id },
+    }).select("-password -refreshToken");
+    const follows = await Follow.find({
+      follower: req.user._id,
+    });
+    const followingIds = new Set(follows.map((f) => f.following.toString()));
+    const result = users.map((user) => ({
+      ...user.toObject(),
+      isFollowing: followingIds.has(user._id.toString()),
+    }));
+
+    return res.json(result);
   } catch (err) {
     return res.status(500).json({
       message: err.message,
     });
   }
 };
+
+const toggleFollow = async (req, res) => {
+  try {
+    const targetUserId = req.params.id;
+
+    // Không cho phép follow chính mình
+    if (req.user._id.toString() === targetUserId) {
+      return res.status(400).json({
+        message: "You cannot follow yourself",
+      });
+    }
+
+    const targetUser = await User.findById(targetUserId);
+
+    if (!targetUser) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    const follow = await Follow.findOne({
+      follower: req.user._id,
+      following: targetUserId,
+    });
+
+    if (follow) {
+      // Unfollow
+      await follow.deleteOne();
+
+      await User.findByIdAndUpdate(req.user._id, {
+        $inc: { followingCount: -1 },
+      });
+
+      await User.findByIdAndUpdate(targetUserId, {
+        $inc: { followersCount: -1 },
+      });
+
+      return res.json({
+        following: false,
+      });
+    }
+
+    // Follow
+    await Follow.create({
+      follower: req.user._id,
+      following: targetUserId,
+    });
+
+    await User.findByIdAndUpdate(req.user._id, {
+      $inc: { followingCount: 1 },
+    });
+
+    await User.findByIdAndUpdate(targetUserId, {
+      $inc: { followersCount: 1 },
+    });
+
+    return res.json({
+      following: true,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
 const getProfile = (req, res) => {
   return res.json({
     message: "Profile data",
@@ -129,4 +210,5 @@ module.exports = {
   getProfile,
   logout,
   refreshToken,
+  toggleFollow,
 };

@@ -9,7 +9,7 @@ const protect = async (req, res, next) => {
   }
   const token = authHeaders.split(" ")[1]
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "secret123");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "access_secret_123");
     const user = await User.findById(decoded._id).select("-password -refreshToken");
 
 if (!user) {

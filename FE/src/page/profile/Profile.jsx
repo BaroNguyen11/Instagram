@@ -5,12 +5,14 @@ import { Link, Outlet, useOutletContext } from "react-router-dom";
 import { useState } from "react";
 import apiClient from "../../api/apiClient";
 import toast from "react-hot-toast";
+import useProfilePosts from "@/hooks/useProfilePosts";
 
 const Profile = () => {
   const { profile } = useProfile();
   const context = useOutletContext();
-  const { posts } = context || { posts: [] };
-  const myPosts = posts.filter((post) => post.author?._id === profile?.User?._id);
+  const { posts, loading, hasMore, refetchPosts } = useProfilePosts(
+    profile?.User?._id,
+  );
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const handleAvatarChange = async (e) => {
@@ -80,14 +82,14 @@ const Profile = () => {
               </div>
               <div className="flex items-center gap-3">
                 <span>
-                  <b>{myPosts.length}</b> posts
+                  <b>{profile?.User?.postsCount}</b> posts
                 </span>
-                <span>
+                <button className="cursor-pointer">
                   <b>{profile?.User?.followersCount || 0}</b> followers
-                </span>
-                <span>
+                </button>
+                <button className="cursor-pointer">
                   <b>{profile?.User?.followingCount || 0}</b> following
-                </span>
+                </button>
               </div>
               <span>{profile?.User?.bio || "No bio available"}</span>
             </div>
@@ -124,7 +126,14 @@ const Profile = () => {
             </div>
           </div>
           <Menu />
-          <Outlet context={context} />
+          <Outlet
+            context={{
+              posts,
+              loading,
+              hasMore,
+              refetchPosts,
+            }}
+          />
         </div>
       </div>
     </>

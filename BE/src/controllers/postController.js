@@ -5,6 +5,7 @@ const Saved = require("../models/Saved");
 const { getUsers } = require("./authController");
 let posts = [];
 const r2Service = require("../services/r2.service");
+const User = require("../models/User");
 
 const createPost = async (req, res) => {
   try {
@@ -37,10 +38,13 @@ const createPost = async (req, res) => {
     const post = await Post.create({
       author: req.user._id,
       caption: req.body.caption,
-      images: images, // mảng chứa các { url: "https://..." }
+      images: images,
+    });
+    await User.findByIdAndUpdate(req.user._id, {
+      $inc: { postsCount: 1 },
     });
 
-    res.status(201).json(post);
+    return res.status(201).json(post);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -97,6 +101,62 @@ const getAllPosts = async (req, res) => {
 
     return res.status(500).json({
       message: err.message,
+    });
+  }
+};
+
+const getPostsByUser = async (req, res) => {
+  try {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 12;
+    const skip = (page - 1) * limit;
+
+    const totalPosts = await Post.countDocuments({
+      author: req.params.id,
+    });
+
+    const posts = await Post.find({
+      author: req.params.id,
+    })
+      .populate("author", "username avatar")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const likes = await PostLike.find({
+      user: req.user._id,
+      post: { $in: posts.map((p) => p._id) },
+    });
+
+    const likedIds = new Set(likes.map((l) => l.post.toString()));
+
+    const savedPosts = await Saved.find({
+      user: req.user._id,
+      post: { $in: posts.map((p) => p._id) },
+    });
+
+    const savedIds = new Set(savedPosts.map((s) => s.post.toString()));
+
+    const result = posts.map((post) => ({
+      ...post.toObject(),
+      liked: likedIds.has(post._id.toString()),
+      saved: savedIds.has(post._id.toString()),
+    }));
+
+    return res.json({
+      posts: result,
+      pagination: {
+        page,
+        limit,
+        totalPosts,
+        totalPages: Math.ceil(totalPosts / limit),
+        hasNextPage: page * limit < totalPosts,
+        hasPrevPage: page > 1,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
     });
   }
 };
@@ -172,7 +232,11 @@ const deletePost = async (req, res) => {
 
     // Xóa post khỏi database
     await post.deleteOne();
-
+    await User.findByIdAndUpdate(post.author, {
+      $inc: {
+        postsCount: -1,
+      },
+    });
     return res.status(200).json({
       message: "Delete successful",
       data: post,
@@ -283,4 +347,5 @@ module.exports = {
   deletePost,
   toggleLike,
   savePosts,
+  getPostsByUser,
 };
