@@ -30,5 +30,9 @@ export const authService = {
   getProfile: async () => {
     const response = await apiClient.get("/auth/profile");
     return response.data;
-  }
+  },
+  toggleFollow: async (id) => {
+    const response = await apiClient.patch(`/auth/${id}/follow`);
+    return response.data;
+  },
 };

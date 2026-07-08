@@ -2,19 +2,26 @@ import { Camera, Plus } from "lucide-react";
 import useProfile from "../../hooks/useProfile";
 import Menu from "./Menu";
 import { Link, Outlet, useOutletContext } from "react-router-dom";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import apiClient from "../../api/apiClient";
 import toast from "react-hot-toast";
 import useProfilePosts from "@/hooks/useProfilePosts";
+import ModalFollow from "./ViewProfile/ModalFollow";
+import { userService } from "@/services/userService";
 
 const Profile = () => {
   const { profile } = useProfile();
-  const context = useOutletContext();
+  const [openFollowers, setOpenFollowers] = useState(false);
+  const [openFollowing, setOpenFollowing] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [isFollowed, setFollowed] = useState("Following");
+  const [users, setUsers] = useState([]);
   const { posts, loading, hasMore, refetchPosts } = useProfilePosts(
     profile?.User?._id,
   );
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
+
   const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -42,10 +49,35 @@ const Profile = () => {
     }
   };
 
+  const handleOpenFollowers = async () => {
+    setOpenFollowers(true);
+    setFollowed("Follower");
+    const res = await userService.getFollowers(profile?.User?._id);
+
+    setUsers(res);
+  };
+
+  const handleOpenFollowing = async () => {
+    setOpenFollowing(true);
+    setFollowed("Following");
+    const res = await userService.getFollowing(profile?.User?._id);
+
+    setUsers(res);
+  };
+
+  const displayUser = useMemo(() => {
+    return users.filter((u) => {
+      const searchLower = searchKeyword.toLowerCase();
+      const matchKeyword = u.username?.toLowerCase().includes(searchLower);
+
+      return matchKeyword;
+    });
+  }, [users, searchKeyword]);
+
   const currentAvatar =
     avatarPreview ||
     profile?.User?.avatar ||
-    "https://scontent.cdninstagram.com/v/t51.89012-19/573323465_1219825463302212_7278921664109726296_n.jpg?stp=dst-jpg_tt6&_nc_cat=1&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy5DMyJ9&_nc_ohc=_zrBf_yIeLcQ7kNvwFGrj0I&_nc_oc=Adosinr6K_o-xcoY62Agpa0Aw2_beJtShTp_fh7O_bIdCYpjy75HhhqRq83jwrhOFqRQfPwFOu3kX6MN4jOD3wRs&_nc_zt=24&_nc_ht=scontent.cdninstagram.com&_nc_gid=6RkWY1QbU0u1d3i-WrdxnA&_nc_ss=7b6a8&oh=00_AQBJOSRO0Qk3ksGfEIs2G-YnwtpMfvL73TwFTpbKOXTE3Q&oe=6A4AFEE2";
+    "https://avatarhub.edu.vn/wp-content/uploads/2025/12/avatar-mac-dinh-cua-fb-4.jpg";
   return (
     <>
       <div className="flex justify-center">
@@ -84,10 +116,16 @@ const Profile = () => {
                 <span>
                   <b>{profile?.User?.postsCount}</b> posts
                 </span>
-                <button className="cursor-pointer">
+                <button
+                  className="cursor-pointer"
+                  onClick={handleOpenFollowers}
+                >
                   <b>{profile?.User?.followersCount || 0}</b> followers
                 </button>
-                <button className="cursor-pointer">
+                <button
+                  className="cursor-pointer"
+                  onClick={handleOpenFollowing}
+                >
                   <b>{profile?.User?.followingCount || 0}</b> following
                 </button>
               </div>
@@ -136,6 +174,27 @@ const Profile = () => {
           />
         </div>
       </div>
+      <ModalFollow
+        isOpen={openFollowers}
+        onClose={() => setOpenFollowers(false)}
+        title="Followers"
+        users={users}
+        displayUser={displayUser}
+        searchKeyword={searchKeyword}
+        setSearchKeyword={setSearchKeyword}
+        isFollowed={isFollowed}
+      />
+
+      <ModalFollow
+        isOpen={openFollowing}
+        onClose={() => setOpenFollowing(false)}
+        title="Following"
+        users={users}
+        searchKeyword={searchKeyword}
+        setSearchKeyword={setSearchKeyword}
+        displayUser={displayUser}
+        isFollowed={isFollowed}
+      />
     </>
   );
 };

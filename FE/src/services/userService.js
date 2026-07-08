@@ -5,8 +5,13 @@ export const userService = {
     const response = await apiClient.get("/users");
     return response.data;
   },
-  toggleFollow: async (id) => {
-    const response = await apiClient.patch(`/auth/${id}/follow`);
+ 
+  getFollowers: async (id) => {
+    const response = await apiClient.get(`/users/follower/${id}`);
+    return response.data;
+  },
+  getFollowing: async (id) => {
+    const response = await apiClient.get(`/users/following/${id}`);
     return response.data;
   },
 };

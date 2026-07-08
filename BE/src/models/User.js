@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema(
 
     email: {
       type: String,
+        required: false,
     },
 
     password: {
@@ -19,7 +20,10 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
 
-    avatar: String,
+    avatar: {
+      type: String,
+      default: "https://avatarhub.edu.vn/wp-content/uploads/2025/12/avatar-mac-dinh-cua-fb-4.jpg"
+    },
 
     bio: String,
     refreshToken: {

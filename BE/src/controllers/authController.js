@@ -10,6 +10,7 @@ const jwt = require("jsonwebtoken");
 const register = async (req, res) => {
   try {
     const { username, password } = req.body;
+    console.log(req.body);
     if (!username || !password) {
       return res.status(400).json({ message: "Missing fields" });
     }

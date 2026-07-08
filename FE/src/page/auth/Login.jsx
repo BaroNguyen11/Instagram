@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const { login } = useAuth();
@@ -14,7 +15,10 @@ const Login = () => {
     e.preventDefault();
     const res = await login(username, password);
     if (res.success) {
-      navigate("/");
+      toast.success("Login successful!");
+      setTimeout(() => {
+        navigate("/");
+      }, 1500);
     } else {
       alert(res.message);
     }

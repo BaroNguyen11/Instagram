@@ -3,15 +3,17 @@ import { useAuth } from "../../context/AuthContext";
 import useProfile from "../../hooks/useProfile";
 import useUsers from "../../hooks/useUsers";
 import { userService } from "@/services/userService";
+import { authService } from "@/services/authService";
 
 const Aside = () => {
   const { isAuthenticated } = useAuth();
   const { profile } = useProfile();
   const { users, setUsers } = useUsers();
   const user = users.filter((follow) => follow.isFollowing === false);
+  console.log(user)
   const handleFollow = async (id) => {
     try {
-      const data = await userService.toggleFollow(id);
+      const data = await authService.toggleFollow(id);
 
       setUsers((prev) =>
         prev.map((user) =>
@@ -66,7 +68,7 @@ const Aside = () => {
             >
               <div className="flex items-center gap-4 mb-4">
                 <img
-                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFBo6bythwEPQHLVrQUDTLl-bVfJ4MnxRDWQ&s"
+                  src={item?.avatar}
                   alt=""
                   className="w-10 h-10 rounded-full"
                 />

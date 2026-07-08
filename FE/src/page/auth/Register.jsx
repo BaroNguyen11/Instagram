@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 const Register = () => {
   const { register } = useAuth(); // Giả định context của bạn có hàm register
@@ -19,14 +20,14 @@ const Register = () => {
 
     // Kiểm tra mật khẩu khớp nhau trước khi gửi API
     if (password !== confirmPassword) {
-      alert("Passwords do not match!");
+      toast.error("Passwords do not match!");
       return;
     }
 
     // Gọi hàm register từ AuthContext (hãy điều chỉnh tùy thuộc vào API thật của bạn)
     const res = await register(username, password);
     if (res.success) {
-      alert("Registration successful!");
+      toast.success("Registration successful!");
       navigate("/login");
     } else {
       alert(res.message);
@@ -69,8 +70,10 @@ const Register = () => {
         {/* Register Form Right Side */}
         <div className="w-[45%] px-12 items-center flex flex-col justify-center ">
           <form action="" className="w-full" onSubmit={handleSubmit}>
-            <h3 className="text-xl font-bold mb-6">Create your BaoGram account</h3>
-            
+            <h3 className="text-xl font-bold mb-6">
+              Create your BaoGram account
+            </h3>
+
             <div className="flex flex-col gap-4 ">
               {/* Username Input */}
               <div className="relative group">
