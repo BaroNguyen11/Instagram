@@ -82,32 +82,32 @@ const EditProfile = () => {
   };
   return (
     <>
-      <div className="max-w-180 mx-auto py-10">
-        <h2 className="font-bold text-2xl pb-10">Edit profile</h2>
-        <div className="rounded-lg bg-[rgba(256,256,256,0.15)] h-25 flex items-center justify-around px-6 ">
+      <div className="w-full max-w-180 mx-auto px-4 py-10">
+        <h2 className="font-bold text-2xl pb-6 md:pb-10">Edit profile</h2>
+        <div className="rounded-lg bg-[rgba(256,256,256,0.15)] h-25 flex items-center justify-around px-4 md:px-6">
           <div className="flex items-center justify-between gap-4 h-full w-full">
-            <div className="flex items-center gap-4 ">
+            <div className="flex items-center gap-3 md:gap-4">
               <img
                 src={profile?.User?.avatar}
                 alt=""
-                className="w-15 h-15 rounded-full"
+                className="w-12 h-12 md:w-15 md:h-15 rounded-full"
               />
               <div className="flex flex-col">
-                <div className="font-bold text-sm">
+                <div className="font-bold text-xs md:text-sm">
                   {profile?.User?.username}
                 </div>
-                <div className="text-sm text-gray-400 ">
+                <div className="text-xs md:text-sm text-gray-400">
                   {profile?.User?.fullName}
                 </div>
               </div>
             </div>
-            <button className="bg-blue-600 text-xs font-bold cursor-pointer px-5 py-2.5 rounded-md hover:bg-blue-700 transition-all duration-200">
+            <button className="bg-blue-600 text-xs font-bold cursor-pointer px-3 md:px-5 py-2 md:py-2.5 rounded-md hover:bg-blue-700 transition-all duration-200">
               Change photo
             </button>
           </div>
         </div>
-        <div className="mt-10">
-          <h3 className="font-bold text-lg">Website</h3>
+        <div className="mt-8 md:mt-10">
+          <h3 className="font-bold text-base md:text-lg">Website</h3>
           <input
             type="text"
             value={website}
@@ -124,7 +124,7 @@ const EditProfile = () => {
           )}
         </div>
         <div className="mt-6">
-          <h3 className="font-bold text-lg">Bio</h3>
+          <h3 className="font-bold text-base md:text-lg">Bio</h3>
           <textarea
             name="bio"
             id="bio"
@@ -143,9 +143,9 @@ const EditProfile = () => {
             {bio.length}/150
           </div>
         </div>
-        <div className="flex justify-center gap-4">
-          <div className="mt-10 w-[50%]">
-            <h3 className="font-bold text-lg">Full Name</h3>
+        <div className="flex flex-col md:flex-row justify-center gap-4">
+          <div className="mt-6 md:mt-10 w-full md:w-[50%]">
+            <h3 className="font-bold text-base md:text-lg">Full Name</h3>
             <input
               type="text"
               placeholder="Full Name"
@@ -154,8 +154,8 @@ const EditProfile = () => {
               onChange={(e) => setFullName(e.target.value)}
             />
           </div>
-          <div className="mt-10 w-[50%]">
-            <h3 className="font-bold text-lg">Birth day</h3>
+          <div className="mt-6 md:mt-10 w-full md:w-[50%]">
+            <h3 className="font-bold text-base md:text-lg">Birth day</h3>
             <input
               type="date"
               placeholder="Birth day"

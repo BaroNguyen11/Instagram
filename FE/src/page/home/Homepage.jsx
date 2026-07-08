@@ -7,9 +7,9 @@ import MainContent from "./MainContent";
 const Homepage = () => {
   const { posts, refetchPosts, page, setPage, hasMore, loading } = useOutletContext();
   return (
-    <div className="flex min-h-screen bg-black text-white">
-      <div className="flex flex-1 justify-center">
-        <main className="w-full max-w-157.5 py-8 px-4">
+    <div className="flex min-h-screen bg-black text-white w-full max-w-full overflow-hidden">
+      <div className="flex flex-1 min-w-0 justify-center">
+        <main className="w-full max-w-157.5 py-8 px-4 min-w-0">
           <Story />
           <div className="mt-8">
             <MainContent

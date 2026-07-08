@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 const PushNotifications = () => {
   return (
     <>
-      <div className="max-w-150 mx-auto py-10">
+      <div className="w-full max-w-150 mx-auto px-4 py-10">
         <div className="flex items-center pb-10 gap-2">
           <ChevronLeft />
           <h2 className="font-bold text-2xl ">Push Notifications</h2>

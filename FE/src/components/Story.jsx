@@ -55,14 +55,14 @@ const Story = () => {
   };
   return (
     <>
-      <div className="relative  ">
+      <div className="relative w-full">
         <div
           onClick={prev}
           className="absolute left-1.5 top-2/5 -translate-y-2/5 bg-white rounded-full p-1 cursor-pointer z-10"
         >
           <ChevronLeft size={20} color="gray" />
         </div>
-        <div className="flex space-x-7 overflow-x-hidden " ref={scrollRef}>
+        <div className="flex space-x-7 overflow-x-auto w-full scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" ref={scrollRef}>
           {data.map((item) => (
             <div className={style} key={item.id}>
               <div className={` ${storyStyle} ${item.active ? "bg-linear-[45deg] from-[#f6ff00] via-[#f15130] to-[#ca09bf]" : "bg-[#3a3a3a]"}`}>

@@ -304,7 +304,7 @@ const Posts = ({ posts, refetchPosts, page, setPage, hasMore, loading }) => {
                 )}
               </div>
             </div>
-            <div className="mt-4 bg-zinc-900 rounded-md overflow-hidden flex items-center justify-center h-128">
+            <div className="mt-4 bg-zinc-900 rounded-md overflow-hidden h-80 sm:h-96 md:h-128">
               <PostImageCarousel images={post.images} caption={post.caption} />
             </div>
             <div className="flex items-center justify-between mt-2">

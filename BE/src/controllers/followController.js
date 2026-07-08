@@ -19,7 +19,6 @@ const getFollowing = async (req, res) => {
     const following = await Following.find({
       follower: req.params.id,
     }).populate("following", "username fullName avatar bio");
-    console.log(following);
     return res.json(following.map((item) => item.following));
   } catch (err) {
     return res.status(500).json({

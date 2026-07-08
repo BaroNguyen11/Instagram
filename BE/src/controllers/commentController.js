@@ -8,7 +8,6 @@ const createComment = async (req, res) => {
   try {
     const postId = req.params.id;
     const post = await Post.findById(postId);
-    console.log(postId)
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
     }

@@ -62,7 +62,6 @@ const Profile = () => {
 
       toast.success("Đã cập nhật ảnh đại diện thành công!");
     } catch (error) {
-      console.log("Lỗi khi upload avatar:", error);
       toast.error("Có lỗi xảy ra, vui lòng thử lại!");
       setAvatarPreview(null);
     } finally {
@@ -102,8 +101,8 @@ const Profile = () => {
   return (
     <>
       <div className="flex justify-center">
-        <div className="flex gap-6 mt-15 w-180 flex-col">
-          <div className="flex items-center gap-5">
+        <div className="flex gap-6 mt-6 md:mt-15 w-full max-w-2xl px-4 md:px-0 flex-col">
+          <div className="flex items-center gap-4 md:gap-8">
             <input
               type="file"
               id="avatar"
@@ -114,31 +113,31 @@ const Profile = () => {
             />
             <label
               htmlFor={isOwnProfile ? "avatar" : undefined}
-              className={isOwnProfile ? "cursor-pointer relative group" : "relative"}
+              className={isOwnProfile ? "cursor-pointer relative group shrink-0" : "relative shrink-0"}
             >
               {/* blur */}
               {isOwnProfile && (
                 <div className="absolute inset-0 group-hover:bg-black/50 transition-all duration-200 rounded-full">
-                  <Camera className="absolute top-1/2 left-1/2 -translate-x-1/2  -translate-y-1/2 w-10 h-10 text-white opacity-0 group-hover:opacity-100 transition-all duration-200" />
+                  <Camera className="absolute top-1/2 left-1/2 -translate-x-1/2  -translate-y-1/2 w-6 h-6 md:w-10 md:h-10 text-white opacity-0 group-hover:opacity-100 transition-all duration-200" />
                 </div>
               )}
               <img
                 src={currentAvatar}
                 alt="Avatar"
-                className="w-35 h-35 rounded-full object-cover"
+                className="w-20 h-20 md:w-35 md:h-35 rounded-full object-cover"
               />
             </label>
 
-            <div className="flex gap-3 mb-4 text-sm flex-col">
-              <div className="flex flex-col ">
-                <div className="font-bold text-2xl">
+            <div className="flex gap-2 md:gap-3 mb-4 text-xs md:text-sm flex-col">
+              <div className="flex flex-col">
+                <div className="font-bold text-xl md:text-2xl">
                   {profile?.User?.username}
                 </div>
-                <div className="text-md text-gray-400 ">
+                <div className="text-sm text-gray-400">
                   {profile?.User?.fullName}
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs md:text-sm">
                 <span>
                   <b>{profile?.User?.postsCount}</b> posts
                 </span>
@@ -155,7 +154,7 @@ const Profile = () => {
                   <b>{profile?.User?.followingCount || 0}</b> following
                 </button>
               </div>
-              <span>{profile?.User?.bio || "No bio available"}</span>
+              <span className="text-gray-200">{profile?.User?.bio || "No bio available"}</span>
             </div>
           </div>
           {isOwnProfile ? (

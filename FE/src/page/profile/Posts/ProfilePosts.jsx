@@ -27,7 +27,7 @@ const ProfilePosts = () => {
           <div>When you share photos, they will appear on your profile.</div>
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-4 pb-10 ">
+        <div className="grid grid-cols-3 gap-1 md:gap-4 pb-10 ">
           {myPosts.map((post) => (
             <div key={post._id} className="aspect-square">
               <img

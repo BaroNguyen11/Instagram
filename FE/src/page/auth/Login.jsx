@@ -45,15 +45,15 @@ const Login = () => {
     "w-full bg-[rgba(255,255,255,0.1)] text-white rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500 ";
   return (
     <>
-      <div className="flex h-screen bg-black text-white ">
-        <div className="w-[60%] border-r-3 border-gray-900 ">
+      <div className="flex h-screen bg-black text-white">
+        <div className="hidden md:block w-[60%] border-r-3 border-gray-900">
           <img
             src="https://pub-896a899647b64fd7b1c609eb1ffb1dd4.r2.dev/banner.png"
             alt="Banner"
             className="w-full h-full object-cover"
           />
         </div>
-        <div className="w-[45%] px-12 items-center flex flex-col justify-center ">
+        <div className="w-full md:w-[40%] px-6 md:px-12 items-center flex flex-col justify-center">
           <form action="" className="w-full" onSubmit={handleSubmit}>
             <h3 className="text-xl font-bold mb-6">Login to BaoGram</h3>
             <div className="flex flex-col gap-4 ">

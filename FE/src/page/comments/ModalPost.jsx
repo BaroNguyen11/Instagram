@@ -178,19 +178,11 @@ const ModalPost = ({ onClose, post, refetchPosts, onLikeToggle }) => {
 
       {/* Modal */}
       <div
-        className={` relative
-    w-fit
-    max-w-[85vw]
-    max-h-[85vh]
-    bg-[#282727]
-    rounded-2xl
-    overflow-hidden
-    z-10
-    flex transition-all duration-300`}
+        className="relative w-full max-w-[95vw] md:max-w-[85vw] max-h-[90vh] md:max-h-[85vh] bg-[#282727] rounded-2xl overflow-hidden z-10 flex transition-all duration-300"
       >
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-col md:flex-row flex-1 overflow-y-auto md:overflow-hidden">
           {/* Left */}
-          <div className="flex items-center justify-center bg-black relative group/modal-carousel select-none overflow-hidden max-h-[90vh] max-w-[70vw]">
+          <div className="bg-black relative group/modal-carousel select-none overflow-hidden w-full md:max-w-[70vw] aspect-square md:aspect-auto">
             <div
               className="flex h-full transition-transform duration-300 ease-out w-full"
               style={{ transform: `translate3d(-${activeImageIndex * 100}%, 0, 0)` }}
@@ -203,7 +195,7 @@ const ModalPost = ({ onClose, post, refetchPosts, onLikeToggle }) => {
                   <img
                     src={img.url}
                     alt={`preview ${idx}`}
-                    className="max-h-[90vh] max-w-[70vw] object-contain block"
+                    className="max-h-[45vh] md:max-h-[80vh] w-full object-contain block"
                   />
                 </div>
               ))}
@@ -251,7 +243,7 @@ const ModalPost = ({ onClose, post, refetchPosts, onLikeToggle }) => {
           </div>
 
           {/* Right */}
-          <div className="w-105 border-l border-[#363636] flex flex-col max-h-[90vh]">
+          <div className="w-full md:w-105 border-t md:border-t-0 md:border-l border-[#363636] flex flex-col max-h-[45vh] md:max-h-[85vh] shrink-0">
              <div className="flex items-center gap-3 p-4">
               <Link to={`/users/${currentPost.author._id}`} onClick={onClose} className="flex items-center gap-3 hover:underline text-white">
                 <img

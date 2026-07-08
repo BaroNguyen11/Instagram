@@ -19,7 +19,7 @@ const Sidebar = () => {
           <input
             type="text"
             placeholder="Search"
-            className="block w-90 text-sm p-2.5  px-9 rounded-full bg-[rgba(255,255,255,0.1)] text-white focus:outline-none "
+            className="block w-full max-w-90 text-sm p-2.5 px-9 rounded-full bg-[rgba(255,255,255,0.1)] text-white focus:outline-none"
           />
         </div>
 

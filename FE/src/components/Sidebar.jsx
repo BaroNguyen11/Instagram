@@ -20,7 +20,8 @@ const Sidebar = ({ refetchPosts }) => {
   const [clicked, setClicked] = useState(false);
   return (
     <>
-      <aside className="h-full  transition-all duration-300 ease-in-out flex flex-col py-8 bg-black text-white group px-4">
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex h-full transition-all duration-300 ease-in-out flex-col py-8 bg-black text-white group px-4">
         <div className="mb-10 flex items-center px-3 h-12">
           <div className="flex justify-center">
             <BaoGramLogo size={30} />
@@ -54,6 +55,32 @@ const Sidebar = ({ refetchPosts }) => {
           <SidebarItem icon={<Menu size={26} />} text="Xem thêm" />
         </div>
       </aside>
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-black border-t border-zinc-850 flex justify-around items-center z-50 px-2">
+        <Link to="/" className="text-white p-2">
+          <Home size={24} />
+        </Link>
+        <Link to="/search" className="text-white p-2">
+          <Search size={24} />
+        </Link>
+        <Link to="/explore" className="text-white p-2">
+          <Compass size={24} />
+        </Link>
+        <div onClick={() => setClicked(true)} className="text-white p-2 cursor-pointer">
+          <PlusSquare size={24} />
+        </div>
+        <Link to="/messages" className="text-white p-2">
+          <Send size={24} />
+        </Link>
+        <Link to="/notifications" className="text-white p-2">
+          <Bell size={24} />
+        </Link>
+        <Link to="/profile" className="text-white p-2">
+          <UserCircle size={24} />
+        </Link>
+      </nav>
+
       {clicked && <ModalUpload onClose={() => setClicked(false)} refetchPosts={refetchPosts} />}
     </>
   );
