@@ -4,6 +4,7 @@ import useProfile from "../../hooks/useProfile";
 import useUsers from "../../hooks/useUsers";
 import { userService } from "@/services/userService";
 import { authService } from "@/services/authService";
+import { Link } from "react-router-dom";
 
 const Aside = () => {
   const { isAuthenticated } = useAuth();
@@ -35,7 +36,7 @@ const Aside = () => {
         <div className="sticky top-10">
           {isAuthenticated && (
             <div className="flex items-center justify-between gap-4 mb-4">
-              <div className="flex items-center gap-4 mb-4">
+              <Link to="/profile" className="flex items-center gap-4 mb-4 hover:underline">
                 <img
                   src={profile?.User?.avatar}
                   alt=""
@@ -49,7 +50,7 @@ const Aside = () => {
                     {profile?.User?.fullName}
                   </div>
                 </div>
-              </div>
+              </Link>
               <button className="text-blue-300 text-xs font-bold cursor-pointer">
                 Switch
               </button>
@@ -60,13 +61,14 @@ const Aside = () => {
             <button className=" text-xs font-bold cursor-pointer">
               See All
             </button>
+
           </div>
           {user.map((item) => (
             <div
               className="flex items-center justify-between gap-2 mb-1"
               key={item._id}
             >
-              <div className="flex items-center gap-4 mb-4">
+              <Link to={`/users/${item._id}`} className="flex items-center gap-4 mb-4 hover:underline">
                 <img
                   src={item?.avatar}
                   alt=""
@@ -76,7 +78,7 @@ const Aside = () => {
                   <div className="font-bold">{item.username}</div>
                   <div className="text-gray-400 text-xs">Suggest for you</div>
                 </div>
-              </div>
+              </Link>
               <button
                 className="text-blue-400 text-xs font-bold cursor-pointer"
                 onClick={() => handleFollow(item._id)}

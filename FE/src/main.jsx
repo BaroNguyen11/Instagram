@@ -48,6 +48,10 @@ createRoot(document.getElementById("root")).render(
               <Route path="saved" element={<ProfileSaved />} />
               <Route path="tagged" element={<ProfileTagged />} />
             </Route>
+            <Route path="/users/:id" element={<Profile />}>
+              <Route index element={<ProfilePosts />} />
+              <Route path="tagged" element={<ProfileTagged />} />
+            </Route>
             <Route
               path="profile/saved/all-posts"
               element={<ProfileAllPosts />}

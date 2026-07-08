@@ -73,8 +73,9 @@ const ModalFollow = ({
                 className="flex items-center justify-between px-4 py-3 ]"
               >
                 <Link
-                  to={`/profile/${user.username}`}
+                  to={`/users/${user._id}`}
                   className="flex items-center gap-3"
+                  onClick={onClose}
                 >
                   <img
                     src={user.avatar || "/default-avatar.png"}

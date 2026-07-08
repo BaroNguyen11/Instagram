@@ -1,3 +1,4 @@
+const Following = require("../models/Following");
 const User = require("../models/User");
 
 const updateProfile = async (req, res) => {
@@ -37,4 +38,36 @@ const updateProfile = async (req, res) => {
       .json({ message: "Có lỗi xảy ra, vui lòng thử lại!" });
   }
 };
-module.exports = { updateProfile };
+
+const getProfile = (req, res) => {
+  return res.json({
+    message: "Profile data",
+    User: req.user,
+  });
+};
+const getUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select(
+      "-password -refreshToken",
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User does not exist",
+      });
+    }
+    const follow = await Following.findOne({
+      follower: req.user._id,
+      following: req.params.id,
+    });
+    return res.json({
+      ...user.toObject(),
+      isFollowing: !!follow,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+module.exports = { updateProfile, getProfile, getUserProfile };

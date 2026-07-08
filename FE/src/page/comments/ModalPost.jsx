@@ -14,6 +14,7 @@ import toast from "react-hot-toast";
 import { commentServices } from "@/services/commentService";
 import { postService } from "@/services/postService";
 import { useEffect, useState, useRef } from "react";
+import { Link } from "react-router-dom";
 
 const ModalPost = ({ onClose, post, refetchPosts, onLikeToggle }) => {
   const [comments, setComments] = useState([]);
@@ -251,31 +252,35 @@ const ModalPost = ({ onClose, post, refetchPosts, onLikeToggle }) => {
 
           {/* Right */}
           <div className="w-105 border-l border-[#363636] flex flex-col max-h-[90vh]">
-            <div className="flex items-center gap-3 p-4">
-              <img
-                src={currentPost.author.avatar}
-                alt=""
-                className="w-8 h-8 rounded-full object-cover"
-              />
+             <div className="flex items-center gap-3 p-4">
+              <Link to={`/users/${currentPost.author._id}`} onClick={onClose} className="flex items-center gap-3 hover:underline text-white">
+                <img
+                  src={currentPost.author.avatar}
+                  alt=""
+                  className="w-8 h-8 rounded-full object-cover"
+                />
 
-              <div className="flex flex-col text-white">
-                <span className="text-sm font-bold">
-                  {currentPost.author.username}
-                </span>
-              </div>
+                <div className="flex flex-col text-white">
+                  <span className="text-sm font-bold">
+                    {currentPost.author.username}
+                  </span>
+                </div>
+              </Link>
             </div>
 
             <div className="flex items-center gap-3 p-4">
-              <img
-                src={currentPost.author.avatar}
-                alt=""
-                className="w-8 h-8 rounded-full object-cover"
-              />
+              <Link to={`/users/${currentPost.author._id}`} onClick={onClose} className="shrink-0">
+                <img
+                  src={currentPost.author.avatar}
+                  alt=""
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+              </Link>
 
               <div className="flex items-center gap-2 text-white">
-                <span className="text-sm font-bold">
+                <Link to={`/users/${currentPost.author._id}`} onClick={onClose} className="text-sm font-bold hover:underline">
                   {currentPost.author.username}
-                </span>
+                </Link>
                 <p className="text-sm">{currentPost.caption}</p>
               </div>
             </div>
@@ -284,18 +289,20 @@ const ModalPost = ({ onClose, post, refetchPosts, onLikeToggle }) => {
               {comments.map((comment) => (
                 <div key={comment._id}>
                   <div className="flex items-center gap-3">
-                    <img
-                      src={comment.user.avatar}
-                      alt=""
-                      className="w-8 h-8 rounded-full object-cover"
-                    />
+                    <Link to={`/users/${comment.user._id}`} onClick={onClose} className="shrink-0">
+                      <img
+                        src={comment.user.avatar}
+                        alt=""
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                    </Link>
 
                     <div className="flex items-center justify-between w-full">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-sm">
+                          <Link to={`/users/${comment.user._id}`} onClick={onClose} className="font-bold text-sm text-white hover:underline">
                             {comment.user.username}
-                          </span>
+                          </Link>
 
                           <p className="text-sm">{comment.content}</p>
                         </div>

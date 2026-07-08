@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
 
 const PostImageCarousel = ({ images, caption }) => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -262,12 +263,14 @@ const Posts = ({ posts, refetchPosts, page, setPage, hasMore, loading }) => {
           <div key={post._id} className="mb-7">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <img
-                  src={post.author.avatar}
-                  alt=""
-                  className="w-8 h-8 rounded-full object-cover"
-                />
-                <div className="font-semibold">{post.author.username}</div>
+                <Link to={`/users/${post.author._id}`} className="flex items-center gap-2 hover:underline">
+                  <img
+                    src={post.author.avatar}
+                    alt=""
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                  <div className="font-semibold">{post.author.username}</div>
+                </Link>
                 <span>•</span>
                 <div className="text-sm text-gray-500">
                   {calculateTimeAgo(post.createdAt)}

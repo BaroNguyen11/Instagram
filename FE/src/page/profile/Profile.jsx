@@ -8,9 +8,10 @@ import toast from "react-hot-toast";
 import useProfilePosts from "@/hooks/useProfilePosts";
 import ModalFollow from "./ViewProfile/ModalFollow";
 import { userService } from "@/services/userService";
+import { authService } from "@/services/authService";
 
 const Profile = () => {
-  const { profile } = useProfile();
+  const { profile, setProfile, isOwnProfile } = useProfile();
   const [openFollowers, setOpenFollowers] = useState(false);
   const [openFollowing, setOpenFollowing] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -21,6 +22,26 @@ const Profile = () => {
   );
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
+
+  const handleFollowToggle = async () => {
+    try {
+      const res = await authService.toggleFollow(profile?.User?._id);
+      setProfile((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          isFollowing: res.following,
+          User: {
+            ...prev.User,
+            followersCount: prev.User.followersCount + (res.following ? 1 : -1),
+          },
+        };
+      });
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update follow status");
+    }
+  };
 
   const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
@@ -89,13 +110,18 @@ const Profile = () => {
               className="hidden"
               accept="image/*"
               onChange={handleAvatarChange}
-              disabled={isUploading}
+              disabled={isUploading || !isOwnProfile}
             />
-            <label htmlFor="avatar" className="cursor-pointer relative group">
+            <label
+              htmlFor={isOwnProfile ? "avatar" : undefined}
+              className={isOwnProfile ? "cursor-pointer relative group" : "relative"}
+            >
               {/* blur */}
-              <div className="absolute inset-0 group-hover:bg-black/50 transition-all duration-200 rounded-full">
-                <Camera className="absolute top-1/2 left-1/2 -translate-x-1/2  -translate-y-1/2 w-10 h-10 text-white opacity-0 group-hover:opacity-100 transition-all duration-200" />
-              </div>
+              {isOwnProfile && (
+                <div className="absolute inset-0 group-hover:bg-black/50 transition-all duration-200 rounded-full">
+                  <Camera className="absolute top-1/2 left-1/2 -translate-x-1/2  -translate-y-1/2 w-10 h-10 text-white opacity-0 group-hover:opacity-100 transition-all duration-200" />
+                </div>
+              )}
               <img
                 src={currentAvatar}
                 alt="Avatar"
@@ -132,17 +158,35 @@ const Profile = () => {
               <span>{profile?.User?.bio || "No bio available"}</span>
             </div>
           </div>
-          <div className="flex gap-4">
-            <Link
-              to="/settings/edit"
-              className="bg-[rgba(256,256,256,0.15)] flex justify-center items-center w-full py-2.5 rounded-lg cursor-pointer hover:bg-[rgba(256,256,256,0.25)] transition-all duration-200"
-            >
-              Edit profile
-            </Link>
-            <button className="bg-[rgba(256,256,256,0.15)] w-full py-2.5 rounded-lg cursor-pointer hover:bg-[rgba(256,256,256,0.25)] transition-all duration-200">
-              View archive
-            </button>
-          </div>
+          {isOwnProfile ? (
+            <div className="flex gap-4">
+              <Link
+                to="/settings/edit"
+                className="bg-[rgba(256,256,256,0.15)] flex justify-center items-center w-full py-2.5 rounded-lg cursor-pointer hover:bg-[rgba(256,256,256,0.25)] transition-all duration-200"
+              >
+                Edit profile
+              </Link>
+              <button className="bg-[rgba(256,256,256,0.15)] w-full py-2.5 rounded-lg cursor-pointer hover:bg-[rgba(256,256,256,0.25)] transition-all duration-200">
+                View archive
+              </button>
+            </div>
+          ) : (
+            <div className="flex gap-4">
+              <button
+                onClick={handleFollowToggle}
+                className={`w-full py-2.5 rounded-lg cursor-pointer transition-all duration-200 font-semibold ${
+                  profile?.isFollowing
+                    ? "bg-[rgba(256,256,256,0.15)] hover:bg-[rgba(256,256,256,0.25)] text-white"
+                    : "bg-blue-500 hover:bg-blue-600 text-white"
+                }`}
+              >
+                {profile?.isFollowing ? "Unfollow" : "Follow"}
+              </button>
+              <button className="bg-[rgba(256,256,256,0.15)] w-full py-2.5 rounded-lg cursor-pointer hover:bg-[rgba(256,256,256,0.25)] transition-all duration-200">
+                Message
+              </button>
+            </div>
+          )}
           {/* outstanding story */}
 
           <div className="flex items-start">
@@ -163,7 +207,7 @@ const Profile = () => {
               <span className="text-xs font-bold">New</span>
             </div>
           </div>
-          <Menu />
+          <Menu isOwnProfile={isOwnProfile} userId={profile?.User?._id} />
           <Outlet
             context={{
               posts,

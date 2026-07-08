@@ -1,4 +1,4 @@
-import { Search } from "lucide-react";
+
 import useProfile from "../../hooks/useProfile";
 import { useEffect, useState } from "react";
 import {
@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { updateProfile } from "../../services/profileService";
+import { profileService } from "../../services/profileService";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 const EditProfile = () => {
@@ -68,7 +68,7 @@ const EditProfile = () => {
         birthDate,
         gender,
       };
-      await updateProfile(data);
+      await profileService.updateProfile(data)
 
       toast.success("Profile updated successfully!");
       setTimeout(() => {
