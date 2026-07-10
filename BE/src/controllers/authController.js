@@ -1,5 +1,6 @@
 const Follow = require("../models/Following");
 const User = require("../models/User");
+
 const {
   generateAccessToken,
   generateRefreshToken,
@@ -132,6 +133,9 @@ const getUsers = async (req, res) => {
   }
 };
 
+const { getIO } = require("../socket/io");
+const Notification = require("../models/Notification");
+
 const toggleFollow = async (req, res) => {
   try {
     const targetUserId = req.params.id;
@@ -187,6 +191,23 @@ const toggleFollow = async (req, res) => {
       $inc: { followersCount: 1 },
     });
 
+    await Notification.create({
+      receiver: targetUserId,
+      sender: req.user._id,
+      type: "follow",
+      isRead: false,
+    });
+    const io = getIO();
+
+    io.to(targetUserId).emit("notification", {
+      type: "follow",
+      sender: {
+        _id: req.user._id,
+        username: req.user.username,
+        avatar: req.user.avatar,
+      },
+      createdAt: new Date(),
+    });
     return res.json({
       following: true,
     });

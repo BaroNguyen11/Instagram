@@ -5,13 +5,14 @@ import useUsers from "../../hooks/useUsers";
 import { userService } from "@/services/userService";
 import { authService } from "@/services/authService";
 import { Link } from "react-router-dom";
+import { socket } from "@/socket/socket";
 
 const Aside = () => {
   const { isAuthenticated } = useAuth();
   const { profile } = useProfile();
   const { users, setUsers } = useUsers();
   const user = users.filter((follow) => follow.isFollowing === false);
-  console.log(user)
+
   const handleFollow = async (id) => {
     try {
       const data = await authService.toggleFollow(id);
@@ -36,7 +37,10 @@ const Aside = () => {
         <div className="sticky top-10">
           {isAuthenticated && (
             <div className="flex items-center justify-between gap-4 mb-4">
-              <Link to="/profile" className="flex items-center gap-4 mb-4 hover:underline">
+              <Link
+                to="/profile"
+                className="flex items-center gap-4 mb-4 hover:underline"
+              >
                 <img
                   src={profile?.User?.avatar}
                   alt=""
@@ -61,14 +65,16 @@ const Aside = () => {
             <button className=" text-xs font-bold cursor-pointer">
               See All
             </button>
-
           </div>
           {user.map((item) => (
             <div
               className="flex items-center justify-between gap-2 mb-1"
               key={item._id}
             >
-              <Link to={`/users/${item._id}`} className="flex items-center gap-4 mb-4 hover:underline">
+              <Link
+                to={`/users/${item._id}`}
+                className="flex items-center gap-4 mb-4 hover:underline"
+              >
                 <img
                   src={item?.avatar}
                   alt=""

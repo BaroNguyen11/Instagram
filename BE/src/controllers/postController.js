@@ -249,7 +249,7 @@ const deletePost = async (req, res) => {
     });
   }
 };
-
+const { getIO } = require("../socket/io");
 const toggleLike = async (req, res) => {
   const post = await Post.findById(req.params.id).populate(
     "author",
@@ -290,6 +290,16 @@ const toggleLike = async (req, res) => {
   post.likeCount++;
   await post.save();
 
+  const io = getIO();
+  io.to(targetUserId).emit("notification", {
+    type: "like",
+    from: {
+      id: req.user._id,
+      username: req.user.username,
+      avatar: req.user.avatar,
+    },
+    createdAt: new Date(),
+  });
   return res.json({
     ...post.toObject(),
     liked: true,

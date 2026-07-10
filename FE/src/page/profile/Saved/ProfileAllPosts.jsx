@@ -1,12 +1,10 @@
-import ModalPost from "@/page/comments/ModalPost";
 import { Bookmark, ChevronLeft } from "lucide-react";
-import { useState } from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext, useLocation } from "react-router-dom";
 
 const ProfileAllPosts = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { posts } = useOutletContext();
-  const [selectedPost, setSelectedPost] = useState(null);
   const postsSaved = posts.filter((p) => p.saved === true);
   return (
     <div className="w-full flex items-center justify-center ">
@@ -25,7 +23,7 @@ const ProfileAllPosts = () => {
               <div
                 key={post._id}
                 className="relative aspect-square overflow-hidden cursor-pointer group"
-                onClick={() => setSelectedPost(post)}
+                onClick={() => navigate(`/p/${post._id}`, { state: { backgroundLocation: location } })}
               >
                 <img
                   src={post.images?.[0]?.url}
@@ -61,13 +59,6 @@ const ProfileAllPosts = () => {
               <button className="text-blue-300">Add to collection</button>
             </div>
           </div>
-        )}
-
-        {selectedPost && (
-          <ModalPost
-            onClose={() => setSelectedPost(null)}
-            post={selectedPost}
-          />
         )}
       </div>
     </div>

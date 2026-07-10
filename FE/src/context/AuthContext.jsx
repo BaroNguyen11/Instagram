@@ -6,19 +6,27 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState(null);
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    if (token) {
-      setIsAuthenticated(true);
+    if (!token) {
+      setLoading(false);
+      return;
     }
 
-    setLoading(false);
+    authService
+      .getProfile()
+      .then((res) => {
+        setCurrentUser(res.User);
+        setIsAuthenticated(true);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   const login = async (username, password) => {
     try {
-      const data = await authService.login(username,password)
+      const data = await authService.login(username, password);
       localStorage.setItem("token", data.accessToken);
       localStorage.setItem("refreshToken", data.refreshToken);
 
@@ -36,7 +44,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (username, password) => {
     try {
-      const data = await authService.register(username,password)
+      const data = await authService.register(username, password);
       return {
         success: true,
       };
@@ -63,15 +71,15 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
- 
   return (
     <AuthContext.Provider
       value={{
+        currentUser,
         isAuthenticated,
         loading,
         login,
         register,
-        logout
+        logout,
       }}
     >
       {children}

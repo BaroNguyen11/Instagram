@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 const PostImageCarousel = ({ images, caption }) => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -81,10 +81,11 @@ const PostImageCarousel = ({ images, caption }) => {
   );
 };
 const Posts = ({ posts, refetchPosts, page, setPage, hasMore, loading }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [openMenu, setOpenMenu] = useState(null);
   const likingRef = useRef({});
   const savedRef = useRef({});
-  const [selectedPost, setSelectedPost] = useState(null);
   const [postList, setPostList] = useState(posts);
 
   const observerTarget = useRef(null);
@@ -116,11 +117,6 @@ const Posts = ({ posts, refetchPosts, page, setPage, hasMore, loading }) => {
   }, [hasMore, loading, setPage]);
   useEffect(() => {
     setPostList(posts);
-    setSelectedPost((prevSelected) => {
-      if (!prevSelected) return null;
-      const updatedSelected = posts.find((p) => p._id === prevSelected._id);
-      return updatedSelected || prevSelected;
-    });
   }, [posts]);
   const iconHover =
     "cursor-pointer hover:scale-109 transition-all duration-200";
@@ -156,6 +152,7 @@ const Posts = ({ posts, refetchPosts, page, setPage, hasMore, loading }) => {
       toast.success("Post deleted successfully!");
       await refetchPosts();
       setOpenMenu(null);
+      window.dispatchEvent(new CustomEvent("post-deleted", { detail: postId }));
     } catch (error) {
       console.error("Error deleting post:", error);
       toast.error(
@@ -181,20 +178,12 @@ const Posts = ({ posts, refetchPosts, page, setPage, hasMore, loading }) => {
           : post,
       ),
     );
-    setSelectedPost((prev) =>
-      prev && prev._id === id
-        ? {
-            ...prev,
-            liked: !prev.liked,
-            likeCount: prev.liked ? prev.likeCount - 1 : prev.likeCount + 1,
-          }
-        : prev,
-    );
     try {
       const updated = await postService.toggleLike(id);
       setPostList((prev) =>
         prev.map((post) => (post._id === id ? updated : post)),
       );
+      window.dispatchEvent(new CustomEvent("post-updated", { detail: updated }));
     } catch (err) {
       setPostList((prev) =>
         prev.map((post) => (post._id === id ? oldPost : post)),
@@ -221,39 +210,19 @@ const Posts = ({ posts, refetchPosts, page, setPage, hasMore, loading }) => {
       ),
     );
 
-    // nếu modal đang mở thì update luôn
-    setSelectedPost((prev) =>
-      prev && prev._id === id
-        ? {
-            ...prev,
-            saved: !prev.saved,
-          }
-        : prev,
-    );
-
     try {
       const updated = await postService.savedPost(id);
       setPostList((prev) =>
         prev.map((post) => (post._id === id ? updated : post)),
       );
-
-      setSelectedPost((prev) => (prev && prev._id === id ? updated : prev));
+      window.dispatchEvent(new CustomEvent("post-updated", { detail: updated }));
     } catch {
       setPostList((prev) =>
         prev.map((post) => (post._id === id ? oldPost : post)),
       );
-
-      setSelectedPost((prev) => (prev && prev._id === id ? oldPost : prev));
     } finally {
       savedRef.current[id] = false;
     }
-  };
-
-  const handleLikeToggleFromModal = (updatedPost) => {
-    setPostList((prev) =>
-      prev.map((p) => (p._id === updatedPost._id ? updatedPost : p))
-    );
-    setSelectedPost(updatedPost);
   };
 
   return (
@@ -304,7 +273,10 @@ const Posts = ({ posts, refetchPosts, page, setPage, hasMore, loading }) => {
                 )}
               </div>
             </div>
-            <div className="mt-4 bg-zinc-900 rounded-md overflow-hidden h-80 sm:h-96 md:h-128">
+            <div
+              className="mt-4 bg-zinc-900 rounded-md overflow-hidden h-80 sm:h-96 md:h-128 cursor-pointer"
+              onClick={() => navigate(`/p/${post._id}`, { state: { backgroundLocation: location } })}
+            >
               <PostImageCarousel images={post.images} caption={post.caption} />
             </div>
             <div className="flex items-center justify-between mt-2">
@@ -326,7 +298,7 @@ const Posts = ({ posts, refetchPosts, page, setPage, hasMore, loading }) => {
                   <MessageCircle
                     size={24}
                     className={iconHover}
-                    onClick={() => setSelectedPost(post)}
+                    onClick={() => navigate(`/p/${post._id}`, { state: { backgroundLocation: location } })}
                   />
                   <span className="text-sm font-semibold">
                     {post.commentCount}
@@ -373,14 +345,6 @@ const Posts = ({ posts, refetchPosts, page, setPage, hasMore, loading }) => {
           </div>
         )}
       </div>
-      {selectedPost && (
-        <ModalPost
-          onClose={() => setSelectedPost(null)}
-          post={selectedPost}
-          refetchPosts={refetchPosts}
-          onLikeToggle={handleLikeToggleFromModal}
-        />
-      )}
     </>
   );
 };

@@ -11,13 +11,20 @@ import {
   Compass,
   Bell,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import BaoGramLogo from "./Logo";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ModalUpload from "../page/upload/ModalUpload";
 
 const Sidebar = ({ refetchPosts }) => {
   const [clicked, setClicked] = useState(false);
+
+  const location = useLocation();
+  const isActive = (path) => location.pathname === path;
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    refetchPosts();
+  }, [location]);
   return (
     <>
       {/* Desktop Sidebar */}
@@ -28,25 +35,25 @@ const Sidebar = ({ refetchPosts }) => {
           </div>
         </div>
         <nav className="flex flex-col space-y-2 flex-1">
-          <Link to="/">
+          <Link to="/" className={isActive("/")}>
             <SidebarItem icon={<Home size={26} />} text="Trang chủ" />
           </Link>
-          <Link to="/search">
+          <Link to="/search" className={isActive("/search")}>
             <SidebarItem icon={<Search size={26} />} text="Tìm kiếm" />
           </Link>
-          <Link to="/explore">
+          <Link to="/explore" className={isActive("/explore")}>
             <SidebarItem icon={<Compass size={26} />} text="Khám phá" />
           </Link>
-          <Link to="/messages">
+          <Link to="/messages" className={isActive("/messages")}>
             <SidebarItem icon={<Send size={26} />} text="Tin nhắn" />
           </Link>
-          <Link to="/notifications">
+          <Link to="/notifications" className={isActive("/notifications")}>
             <SidebarItem icon={<Bell size={26} />} text="Thông báo" />
           </Link>
           <div onClick={() => setClicked(true)}>
             <SidebarItem icon={<PlusSquare size={26} />} text="Tạo" />
           </div>
-          <Link to="/profile">
+          <Link to="/profile"  className={isActive("/profile")}>
             <SidebarItem icon={<UserCircle size={26} />} text="Hồ sơ" />
           </Link>
         </nav>
@@ -67,7 +74,10 @@ const Sidebar = ({ refetchPosts }) => {
         <Link to="/explore" className="text-white p-2">
           <Compass size={24} />
         </Link>
-        <div onClick={() => setClicked(true)} className="text-white p-2 cursor-pointer">
+        <div
+          onClick={() => setClicked(true)}
+          className="text-white p-2 cursor-pointer"
+        >
           <PlusSquare size={24} />
         </div>
         <Link to="/messages" className="text-white p-2">
@@ -81,7 +91,12 @@ const Sidebar = ({ refetchPosts }) => {
         </Link>
       </nav>
 
-      {clicked && <ModalUpload onClose={() => setClicked(false)} refetchPosts={refetchPosts} />}
+      {clicked && (
+        <ModalUpload
+          onClose={() => setClicked(false)}
+          refetchPosts={refetchPosts}
+        />
+      )}
     </>
   );
 };

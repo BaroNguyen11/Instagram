@@ -2,13 +2,14 @@ import { Camera, Plus } from "lucide-react";
 import useProfile from "../../hooks/useProfile";
 import Menu from "./Menu";
 import { Link, Outlet, useOutletContext } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import apiClient from "../../api/apiClient";
 import toast from "react-hot-toast";
 import useProfilePosts from "@/hooks/useProfilePosts";
 import ModalFollow from "./ViewProfile/ModalFollow";
 import { userService } from "@/services/userService";
 import { authService } from "@/services/authService";
+
 
 const Profile = () => {
   const { profile, setProfile, isOwnProfile } = useProfile();
@@ -22,6 +23,8 @@ const Profile = () => {
   );
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
+
+
 
   const handleFollowToggle = async () => {
     try {
@@ -113,7 +116,11 @@ const Profile = () => {
             />
             <label
               htmlFor={isOwnProfile ? "avatar" : undefined}
-              className={isOwnProfile ? "cursor-pointer relative group shrink-0" : "relative shrink-0"}
+              className={
+                isOwnProfile
+                  ? "cursor-pointer relative group shrink-0"
+                  : "relative shrink-0"
+              }
             >
               {/* blur */}
               {isOwnProfile && (
@@ -154,7 +161,9 @@ const Profile = () => {
                   <b>{profile?.User?.followingCount || 0}</b> following
                 </button>
               </div>
-              <span className="text-gray-200">{profile?.User?.bio || "No bio available"}</span>
+              <span className="text-gray-200">
+                {profile?.User?.bio || "No bio available"}
+              </span>
             </div>
           </div>
           {isOwnProfile ? (

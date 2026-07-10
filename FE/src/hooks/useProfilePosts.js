@@ -54,6 +54,34 @@ const useProfilePosts = (userId) => {
     });
   }, [fetchPost]);
 
+  useEffect(() => {
+    const handlePostUpdate = (e) => {
+      const updatedPost = e.detail;
+      setPosts((prev) =>
+        prev.map((p) => (p._id === updatedPost._id ? updatedPost : p))
+      );
+    };
+
+    const handlePostDelete = (e) => {
+      const deletedPostId = e.detail;
+      setPosts((prev) => prev.filter((p) => p._id !== deletedPostId));
+    };
+
+    const handleRefetch = () => {
+      refetchPosts();
+    };
+
+    window.addEventListener("post-updated", handlePostUpdate);
+    window.addEventListener("post-deleted", handlePostDelete);
+    window.addEventListener("refetch-posts", handleRefetch);
+
+    return () => {
+      window.removeEventListener("post-updated", handlePostUpdate);
+      window.removeEventListener("post-deleted", handlePostDelete);
+      window.removeEventListener("refetch-posts", handleRefetch);
+    };
+  }, [refetchPosts]);
+
   return {
     posts,
     loading,

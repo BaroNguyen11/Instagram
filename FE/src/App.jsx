@@ -2,16 +2,41 @@ import "./App.css";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import usePost from "./hooks/usePost";
-import { Toaster } from "react-hot-toast";
-import { useEffect, useState } from "react";
-import { postService } from "./services/postService";
+import toast, { Toaster } from "react-hot-toast";
+import { useEffect } from "react";
+import { socket } from "./socket/socket";
+import { useAuth } from "./context/AuthContext";
+
+
 function App() {
   const { posts, page, setPage, hasMore, refetchPosts, loading } = usePost();
+  const { currentUser } = useAuth();
+
+  useEffect(() => {
+    if (!currentUser) return;
+
+    socket.emit("join", currentUser._id);
+  }, [currentUser]);
+
+  useEffect(() => {
+    socket.on("notification", (data) => {
+      toast(`${data.sender.username} followed you.`, {
+        icon: "🔔",
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+    });
+
+    return () => socket.off("notification");
+  }, []);
 
   return (
     <>
       <Toaster className="z-9999" />
-      
+
       {/* Mobile Bottom Navigation Container (outside flex to prevent layout offset) */}
       <div className="md:hidden">
         <Sidebar refetchPosts={refetchPosts} />
@@ -24,7 +49,9 @@ function App() {
         </aside>
 
         <main className="flex-1 min-w-0 ml-0 md:ml-25 pb-20 md:pb-0">
-          <Outlet context={{ posts, refetchPosts, page, setPage, hasMore, loading }} />
+          <Outlet
+            context={{ posts, refetchPosts, page, setPage, hasMore, loading }}
+          />
         </main>
       </div>
     </>
