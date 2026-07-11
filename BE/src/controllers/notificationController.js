@@ -63,17 +63,8 @@ const notificationUnRead = async (req, res) => {
       receiver: req.user._id,
       isRead: false,
     });
-    const notifications = await Notification.find({
-      receiver: req.user._id,
-      isRead: false,
-    })
-      .populate("sender", "username avatar")
-      .populate("post", "images")
-      .sort({ createdAt: -1 });
-    return res.json({
-      count,
-      notifications,
-    });
+
+    return res.json(count);
   } catch (error) {
     console.error(error);
     return res.status(500).json({

@@ -250,6 +250,7 @@ const deletePost = async (req, res) => {
   }
 };
 const { getIO } = require("../socket/io");
+const Notification = require("../models/Notification");
 const toggleLike = async (req, res) => {
   const post = await Post.findById(req.params.id).populate(
     "author",
@@ -289,17 +290,28 @@ const toggleLike = async (req, res) => {
 
   post.likeCount++;
   await post.save();
-
   const io = getIO();
-  io.to(targetUserId).emit("notification", {
-    type: "like",
-    from: {
-      id: req.user._id,
-      username: req.user.username,
-      avatar: req.user.avatar,
-    },
-    createdAt: new Date(),
-  });
+
+  if (post.author._id.toString() !== req.user._id.toString()) {
+    await Notification.create({
+      receiver: post.author._id,
+      sender: req.user._id,
+      type: "like",
+      post: post._id,
+      isRead: false,
+    });
+    io.to(req.params.id).emit("notification", {
+      type: "like",
+      sender: {
+        id: req.user._id,
+        username: req.user.username,
+        avatar: req.user.avatar,
+      },
+      postId: post._id,
+      createdAt: new Date(),
+    });
+  }
+
   return res.json({
     ...post.toObject(),
     liked: true,

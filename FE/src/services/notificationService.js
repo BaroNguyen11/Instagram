@@ -9,7 +9,7 @@ export const notificationService = {
     const response = await apiClient.get("/notifications/unread-count");
     return response.data;
   },
-  notificationIsRead: async () => {
+  notificationIsRead: async (id) => {
     const response = await apiClient.patch(`/notifications/${id}/read`);
     return response.data;
   },

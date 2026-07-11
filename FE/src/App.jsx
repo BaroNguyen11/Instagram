@@ -20,14 +20,15 @@ function App() {
 
   useEffect(() => {
     socket.on("notification", (data) => {
-      toast(`${data.sender.username} followed you.`, {
-        icon: "🔔",
-        style: {
-          borderRadius: "10px",
-          background: "#333",
-          color: "#fff",
-        },
-      });
+      console.log(data)
+      // toast(`${data.sender.username} followed you.`, {
+      //   icon: "🔔",
+      //   style: {
+      //     borderRadius: "10px",
+      //     background: "#333",
+      //     color: "#fff",
+      //   },
+      // });
     });
 
     return () => socket.off("notification");

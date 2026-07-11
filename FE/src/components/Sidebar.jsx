@@ -10,21 +10,36 @@ import {
   Send,
   Compass,
   Bell,
+  Dot,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import BaoGramLogo from "./Logo";
 import { useEffect, useState } from "react";
 import ModalUpload from "../page/upload/ModalUpload";
+import useNotifications from "@/hooks/useNotifications";
 
 const Sidebar = ({ refetchPosts }) => {
   const [clicked, setClicked] = useState(false);
 
+  const { notifications } = useNotifications();
+  const isRead = notifications.find((i) => i.isRead === false);
   const location = useLocation();
   const isActive = (path) => location.pathname === path;
   useEffect(() => {
     window.scrollTo(0, 0);
     refetchPosts();
   }, [location]);
+  const BellIcon = () => (
+    <div className="relative w-7 h-7 flex items-center justify-center">
+      <Bell size={26} />
+
+      {isRead && (
+        <div className="absolute -top-6 -right-6 ">
+          <Dot className="w-14 h-14" stroke="#ef4444" />
+        </div>
+      )}
+    </div>
+  );
   return (
     <>
       {/* Desktop Sidebar */}
@@ -47,13 +62,13 @@ const Sidebar = ({ refetchPosts }) => {
           <Link to="/messages" className={isActive("/messages")}>
             <SidebarItem icon={<Send size={26} />} text="Tin nhắn" />
           </Link>
-          <Link to="/notifications" className={isActive("/notifications")}>
-            <SidebarItem icon={<Bell size={26} />} text="Thông báo" />
+          <Link to="/notifications">
+            <SidebarItem icon={<BellIcon />} text="Thông báo" />
           </Link>
           <div onClick={() => setClicked(true)}>
             <SidebarItem icon={<PlusSquare size={26} />} text="Tạo" />
           </div>
-          <Link to="/profile"  className={isActive("/profile")}>
+          <Link to="/profile" className={isActive("/profile")}>
             <SidebarItem icon={<UserCircle size={26} />} text="Hồ sơ" />
           </Link>
         </nav>
