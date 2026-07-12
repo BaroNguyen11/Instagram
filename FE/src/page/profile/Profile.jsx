@@ -10,7 +10,6 @@ import ModalFollow from "./ViewProfile/ModalFollow";
 import { userService } from "@/services/userService";
 import { authService } from "@/services/authService";
 
-
 const Profile = () => {
   const { profile, setProfile, isOwnProfile } = useProfile();
   const [openFollowers, setOpenFollowers] = useState(false);
@@ -23,8 +22,6 @@ const Profile = () => {
   );
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
-
-
 
   const handleFollowToggle = async () => {
     try {

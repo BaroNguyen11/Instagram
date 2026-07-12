@@ -1,9 +1,10 @@
 const Comment = require("../models/Comment");
 const CommentLike = require("../models/CommentLike");
+const Notification = require("../models/Notification");
 
 const Post = require("../models/Post");
 const User = require("../models/User");
-
+const { getIO } = require("../socket/io");
 const createComment = async (req, res) => {
   try {
     const postId = req.params.id;
@@ -23,6 +24,30 @@ const createComment = async (req, res) => {
     await post.save();
 
     await comment.populate("user", "username avatar");
+    const io = getIO();
+
+
+    if (post.author.toString() !== req.user._id.toString()) {
+      await Notification.create({
+        receiver: post.author,
+        sender: req.user._id,
+        type: "comment",
+        post: post._id,
+        isRead: false,
+      });
+      io.to(post.author.toString()).emit("notification", {
+        type: "comment",
+        sender: {
+          id: req.user._id,
+          username: req.user.username,
+          avatar: req.user.avatar,
+        },
+        postId: post._id,
+        createdAt: new Date(),
+      });
+
+    }
+
     return res.status(201).json(comment);
   } catch (err) {
     return res.status(500).json({ message: err.message });

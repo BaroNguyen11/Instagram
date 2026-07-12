@@ -1,3 +1,4 @@
+const Following = require("../models/Following");
 const Notification = require("../models/Notification");
 
 const getAllNotifications = async (req, res) => {
@@ -8,7 +9,19 @@ const getAllNotifications = async (req, res) => {
       .populate("sender", "username avatar")
       .populate("post", "images")
       .sort({ createdAt: -1 });
-    return res.json(notifications);
+
+    const follows = await Following.find({
+      follower: req.user._id,
+    }).select("following");
+
+    const followingIds = new Set(follows.map((f) => f.following.toString()));
+
+    const result = notifications.map((noti) => ({
+      ...noti.toObject(),
+      isFollowing: followingIds.has(noti.sender._id.toString()),
+    }));
+
+    return res.json(result);
   } catch (error) {
     console.error(error);
     return res.status(500).json({

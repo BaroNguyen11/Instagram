@@ -300,7 +300,7 @@ const toggleLike = async (req, res) => {
       post: post._id,
       isRead: false,
     });
-    io.to(req.params.id).emit("notification", {
+    io.to(post.author._id.toString()).emit("notification", {
       type: "like",
       sender: {
         id: req.user._id,

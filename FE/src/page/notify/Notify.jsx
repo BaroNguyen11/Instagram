@@ -1,17 +1,16 @@
 import useNotifications from "@/hooks/useNotifications";
+import { authService } from "@/services/authService";
 import { notificationService } from "@/services/notificationService";
 import { Dot, Heart } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Notify = () => {
-  const { notifications, unread } = useNotifications();
+  const { notifications, unread, setNotifications } = useNotifications();
   const [isActive, setActive] = useState("Tất cả");
   const navigate = useNavigate();
   console.log(notifications);
-  const notificationsUnread = notifications.filter(
-    (notifications) => notifications.isRead === false,
-  );
+
   const calculateTimeAgo = (createdAt) => {
     const now = new Date();
     const postDate = new Date(createdAt);
@@ -41,6 +40,7 @@ const Notify = () => {
         return "";
     }
   };
+
   const handleClick = async (noti) => {
     await notificationService.notificationIsRead(noti._id);
     switch (noti.type) {
@@ -61,11 +61,30 @@ const Notify = () => {
     switch (noti.type) {
       case "follow":
         return (
-          <button className="bg-[#1356ff] font-bold text-xs rounded-md px-4 py-2 cursor-pointer w-30">
-            Follow back
+          <button
+            className={`font-bold text-xs rounded-md px-4 py-2 cursor-pointer w-30 ${
+              noti.isFollowing ? "bg-[rgb(256,256,256,0.1)]" : "bg-[#1356ff]"
+            }`}
+            onClick={async (e) => {
+              e.stopPropagation();
+
+              const res = await authService.toggleFollow(noti.sender._id);
+
+              setNotifications((prev) =>
+                prev.map((item) =>
+                  item._id === noti._id
+                    ? {
+                        ...item,
+                        isFollowing: res.following,
+                      }
+                    : item,
+                ),
+              );
+            }}
+          >
+            {noti.isFollowing ? "Following" : "Follow back"}
           </button>
         );
-
       case "like":
         return (
           <button className="bg-[#ff1352] rounded-full p-2  cursor-pointer">

@@ -27,6 +27,6 @@ const useNotifications = () => {
 
     fetchNotifications();
   }, []);
-  return { notifications, unread };
+  return { notifications, unread,setNotifications };
 };
 export default useNotifications;
