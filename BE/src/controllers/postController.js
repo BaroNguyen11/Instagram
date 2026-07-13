@@ -273,6 +273,11 @@ const toggleLike = async (req, res) => {
 
   if (liked) {
     await liked.deleteOne();
+    await Notification.deleteOne({
+      receiver: post.author._id,
+      sender: req.user._id,
+      type: "like",
+    });
     post.likeCount--;
     await post.save();
 

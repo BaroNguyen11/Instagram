@@ -15,6 +15,7 @@ const postRoutes = require("./routes/postRoutes");
 const userRoutes = require("./routes/userRoutes");
 const profileRoutes = require("./routes/profileRoutes");
 const notificationsRoutes = require("./routes/notificationRoute");
+const messageRoutes = require("./routes/messageRoutes");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -30,6 +31,7 @@ app.use("/posts", postRoutes);
 app.use("/users", userRoutes);
 app.use("/profile", profileRoutes);
 app.use("/notifications", notificationsRoutes);
+app.use("/messages", messageRoutes);
 
 // Global error handling middleware
 app.use((err, req, res, next) => {
@@ -59,8 +61,7 @@ const io = new Server(server, {
   },
 });
 initIO(io);
-socketHandler(io)
-
+socketHandler(io);
 
 server.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);

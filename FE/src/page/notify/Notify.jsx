@@ -135,41 +135,45 @@ const Notify = () => {
         </button>
       </div>
       <div className="flex flex-col gap-3">
-        {displayNotifications.map((noti) => (
-          <div
-            key={noti._id}
-            className={`cursor-pointer hover:bg-[rgba(256,256,256,0.1)] py-2 px-5 rounded-md relative ${noti.isRead === false ? "bg-[rgba(256,256,256,0.08)]" : ""}`}
-            onClick={() => handleClick(noti)}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <img
-                  src={noti.sender?.avatar}
-                  alt=""
-                  className="w-10 h-10 rounded-full"
-                />
+        {displayNotifications.length !== 0 ? (
+          displayNotifications.map((noti) => (
+            <div
+              key={noti._id}
+              className={`cursor-pointer hover:bg-[rgba(256,256,256,0.1)] py-2 px-5 rounded-md relative ${noti.isRead === false ? "bg-[rgba(256,256,256,0.08)]" : ""}`}
+              onClick={() => handleClick(noti)}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <img
+                    src={noti.sender?.avatar}
+                    alt=""
+                    className="w-10 h-10 rounded-full"
+                  />
 
-                <div className="flex text-sm gap-1">
-                  <span className="font-bold">{noti.sender?.username}</span>
+                  <div className="flex text-sm gap-1">
+                    <span className="font-bold">{noti.sender?.username}</span>
 
-                  <p>{getMessage(noti)}</p>
+                    <p>{getMessage(noti)}</p>
 
-                  <span className="text-gray-500">
-                    {calculateTimeAgo(noti.createdAt)}
-                  </span>
+                    <span className="text-gray-500">
+                      {calculateTimeAgo(noti.createdAt)}
+                    </span>
+                  </div>
                 </div>
+
+                {renderAction(noti)}
               </div>
 
-              {renderAction(noti)}
+              {!noti.isRead && (
+                <div className="absolute -right-3 top-1/2 -translate-y-1/2">
+                  <Dot className="w-10 h-10" stroke="#1395ff" />
+                </div>
+              )}
             </div>
-
-            {!noti.isRead && (
-              <div className="absolute -right-3 top-1/2 -translate-y-1/2">
-                <Dot className="w-10 h-10" stroke="#1395ff" />
-              </div>
-            )}
-          </div>
-        ))}
+          ))
+        ) : (
+          <div className="text-sm m-auto text-gray-600">Không có thông báo!</div>
+        )}
       </div>
     </div>
   );

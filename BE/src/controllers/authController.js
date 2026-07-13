@@ -1,5 +1,6 @@
 const Follow = require("../models/Following");
 const User = require("../models/User");
+const Message = require("../models/Message");
 
 const {
   generateAccessToken,
@@ -120,10 +121,39 @@ const getUsers = async (req, res) => {
       follower: req.user._id,
     });
     const followingIds = new Set(follows.map((f) => f.following.toString()));
-    const result = users.map((user) => ({
-      ...user.toObject(),
-      isFollowing: followingIds.has(user._id.toString()),
-    }));
+    const result = await Promise.all(
+      users.map(async (user) => {
+        const lastMessage = await Message.findOne({
+          $or: [
+            { sender: req.user._id, receiver: user._id },
+            { sender: user._id, receiver: req.user._id },
+          ],
+        })
+          .sort({ createdAt: -1 })
+          .select("text sender receiver isRead createdAt");
+
+        return {
+          ...user.toObject(),
+          isFollowing: followingIds.has(user._id.toString()),
+          lastMessage: lastMessage
+            ? {
+                text: lastMessage.text,
+                sender: lastMessage.sender,
+                receiver: lastMessage.receiver,
+                isRead: lastMessage.isRead,
+                createdAt: lastMessage.createdAt,
+              }
+            : null,
+        };
+      })
+    );
+
+    // Sort by lastMessage.createdAt descending, putting active conversations first
+    result.sort((a, b) => {
+      const timeA = a.lastMessage ? new Date(a.lastMessage.createdAt).getTime() : 0;
+      const timeB = b.lastMessage ? new Date(b.lastMessage.createdAt).getTime() : 0;
+      return timeB - timeA;
+    });
 
     return res.json(result);
   } catch (err) {
@@ -163,6 +193,18 @@ const toggleFollow = async (req, res) => {
     if (follow) {
       // Unfollow
       await follow.deleteOne();
+      
+      const latestNotification = await Notification.findOne({
+        receiver: targetUserId,
+        sender: req.user._id,
+        type: "follow",
+      })
+        .sort({ createdAt: -1 })
+        .select("_id");
+
+      if (latestNotification) {
+        await Notification.findByIdAndDelete(latestNotification._id);
+      }
 
       await User.findByIdAndUpdate(req.user._id, {
         $inc: { followingCount: -1 },
