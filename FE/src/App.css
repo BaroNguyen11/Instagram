@@ -4,6 +4,7 @@
 @import "@fontsource-variable/inter";
 
 @custom-variant dark (&:is(.dark *));
+
 .custom-scroll::-webkit-scrollbar {
   width: 6px;
 }
@@ -26,6 +27,28 @@
   scrollbar-width: thin;
   scrollbar-color: #3f3f46 transparent;
 }
+
+.custom-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 9999px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
 @theme inline {
   --font-heading: var(--font-sans);
   --font-sans: "Inter Variable", sans-serif;
@@ -142,9 +165,11 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   html {
     @apply font-sans;
   }

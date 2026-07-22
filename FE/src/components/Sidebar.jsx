@@ -12,11 +12,22 @@ import {
   Bell,
   Dot,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Link, useLocation } from "react-router-dom";
 import BaoGramLogo from "./Logo";
 import { useEffect, useState } from "react";
 import ModalUpload from "../page/upload/ModalUpload";
 import useNotifications from "@/hooks/useNotifications";
+import useUsers from "@/hooks/useUsers";
 
 const Sidebar = ({ refetchPosts }) => {
   const [clicked, setClicked] = useState(false);
@@ -25,6 +36,7 @@ const Sidebar = ({ refetchPosts }) => {
   const isRead = notifications.find((i) => i.isRead === false);
   const location = useLocation();
   const isActive = (path) => location.pathname === path;
+
   useEffect(() => {
     window.scrollTo(0, 0);
     refetchPosts();
@@ -40,6 +52,28 @@ const Sidebar = ({ refetchPosts }) => {
       )}
     </div>
   );
+  ("use client");
+
+  const DropdownMenuBasic = () => {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger render={<Button variant="outline">Open</Button>} />
+        <DropdownMenuContent>
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuItem>Profile</DropdownMenuItem>
+            <DropdownMenuItem>Billing</DropdownMenuItem>
+            <DropdownMenuItem>Settings</DropdownMenuItem>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem>GitHub</DropdownMenuItem>
+          <DropdownMenuItem>Support</DropdownMenuItem>
+          <DropdownMenuItem disabled>API</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  };
+
   return (
     <>
       {/* Desktop Sidebar */}
@@ -66,7 +100,8 @@ const Sidebar = ({ refetchPosts }) => {
             <SidebarItem icon={<BellIcon />} text="Thông báo" />
           </Link>
           <div onClick={() => setClicked(true)}>
-            <SidebarItem icon={<PlusSquare size={26} />} text="Tạo" />
+          <SidebarItem icon={<PlusSquare size={26} />} text="Tạo" />
+       
           </div>
           <Link to="/profile" className={isActive("/profile")}>
             <SidebarItem icon={<UserCircle size={26} />} text="Hồ sơ" />
@@ -112,6 +147,7 @@ const Sidebar = ({ refetchPosts }) => {
           refetchPosts={refetchPosts}
         />
       )}
+     
     </>
   );
 };

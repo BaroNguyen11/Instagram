@@ -28,4 +28,6 @@ followSchema.index(
   }
 );
 
+followSchema.index({ following: 1, follower: 1 });
+
 module.exports = mongoose.model("Follow", followSchema);

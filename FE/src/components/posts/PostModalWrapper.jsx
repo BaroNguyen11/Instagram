@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { postService } from "../services/postService";
-import ModalPost from "../page/comments/ModalPost";
+import { postService } from "../../services/postService";
+import ModalPost from "../../page/comments/ModalPost";
 import toast from "react-hot-toast";
 
 const PostModalWrapper = () => {

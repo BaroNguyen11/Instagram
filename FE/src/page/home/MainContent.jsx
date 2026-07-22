@@ -1,4 +1,4 @@
-import Posts from "../../components/Posts";
+import Posts from "../../components/posts/Posts";
 
 
 const MainContent = ({ posts, refetchPosts, page, setPage, hasMore, loading }) => {

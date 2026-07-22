@@ -114,39 +114,64 @@ const refreshToken = async (req, res) => {
 
 const getUsers = async (req, res) => {
   try {
-    const users = await User.find({
-      _id: { $ne: req.user._id },
-    }).select("-password -refreshToken");
-    const follows = await Follow.find({
-      follower: req.user._id,
-    });
-    const followingIds = new Set(follows.map((f) => f.following.toString()));
-    const result = await Promise.all(
-      users.map(async (user) => {
-        const lastMessage = await Message.findOne({
-          $or: [
-            { sender: req.user._id, receiver: user._id },
-            { sender: user._id, receiver: req.user._id },
-          ],
-        })
-          .sort({ createdAt: -1 })
-          .select("text sender receiver isRead createdAt");
+    const [users, follows, messageGroups] = await Promise.all([
+      User.find({
+        _id: { $ne: req.user._id },
+      }).select("-password -refreshToken").lean(),
+      Follow.find({
+        follower: req.user._id,
+      }).select("following").lean(),
+      Message.aggregate([
+        {
+          $match: {
+            $or: [
+              { sender: req.user._id },
+              { receiver: req.user._id },
+            ],
+          },
+        },
+        {
+          $sort: { createdAt: -1 },
+        },
+        {
+          $group: {
+            _id: {
+              $cond: [
+                { $eq: ["$sender", req.user._id] },
+                "$receiver",
+                "$sender",
+              ],
+            },
+            lastMessage: { $first: "$$ROOT" },
+          },
+        },
+      ]),
+    ]);
 
-        return {
-          ...user.toObject(),
-          isFollowing: followingIds.has(user._id.toString()),
-          lastMessage: lastMessage
-            ? {
-                text: lastMessage.text,
-                sender: lastMessage.sender,
-                receiver: lastMessage.receiver,
-                isRead: lastMessage.isRead,
-                createdAt: lastMessage.createdAt,
-              }
-            : null,
-        };
-      })
-    );
+    const messageMap = new Map();
+    messageGroups.forEach((group) => {
+      if (group._id) {
+        messageMap.set(group._id.toString(), group.lastMessage);
+      }
+    });
+
+    const followingIds = new Set(follows.map((f) => f.following.toString()));
+    const result = users.map((user) => {
+      const lastMessage = messageMap.get(user._id.toString()) || null;
+      return {
+        ...user,
+        isFollowing: followingIds.has(user._id.toString()),
+        lastMessage: lastMessage
+          ? {
+              text: lastMessage.text,
+              sender: lastMessage.sender,
+              receiver: lastMessage.receiver,
+              isRead: lastMessage.isRead,
+              createdAt: lastMessage.createdAt,
+            }
+          : null,
+      };
+    });
 
     // Sort by lastMessage.createdAt descending, putting active conversations first
     result.sort((a, b) => {

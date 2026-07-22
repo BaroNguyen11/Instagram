@@ -30,6 +30,8 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("token", data.accessToken);
       localStorage.setItem("refreshToken", data.refreshToken);
 
+      const profile = await authService.getProfile();
+      setCurrentUser(profile.User);
       setIsAuthenticated(true);
       return {
         success: true,

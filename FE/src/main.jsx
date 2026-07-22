@@ -1,29 +1,30 @@
-import { StrictMode } from "react";
+import { StrictMode, lazy, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.jsx";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import Homepage from "./page/home/Homepage.jsx";
-import Message from "./page/message/Message.jsx";
-import Notify from "./page/notify/Notify.jsx";
-import UploadPost from "./page/upload/UploadPost.jsx";
-import Profile from "./page/profile/Profile.jsx";
-import SearchPage from "./page/search/SearchPage.jsx";
-import Explore from "./page/explore/Explore.jsx";
-import Login from "./page/auth/Login.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
-import ProfileSaved from "./page/profile/Saved/ProfileSaved.jsx";
-import ProfilePosts from "./page/profile/Posts/ProfilePosts.jsx";
-import ProfileTagged from "./page/profile/Tagged/ProfileTagged.jsx";
-import ProfileAllPosts from "./page/profile/Saved/ProfileAllPosts.jsx";
-import Register from "./page/auth/Register.jsx";
-import Settings from "./page/edit/Settings.jsx";
-import EditProfile from "./page/edit/EditProfile.jsx";
-import Notifications from "./page/edit/Notifications/Notifications.jsx";
-import PushNotifications from "./page/edit/Notifications/PushNotifications";
-import PostModalWrapper from "./components/PostModalWrapper.jsx";
-import PostDetailPage from "./page/post/PostDetailPage.jsx";
+
+const Homepage = lazy(() => import("./page/home/Homepage.jsx"));
+const Message = lazy(() => import("./page/message/Message.jsx"));
+const Notify = lazy(() => import("./page/notify/Notify.jsx"));
+const UploadPost = lazy(() => import("./page/upload/UploadPost.jsx"));
+const Profile = lazy(() => import("./page/profile/Profile.jsx"));
+const SearchPage = lazy(() => import("./page/search/SearchPage.jsx"));
+const Explore = lazy(() => import("./page/explore/Explore.jsx"));
+const Login = lazy(() => import("./page/auth/Login.jsx"));
+const ProfileSaved = lazy(() => import("./page/profile/Saved/ProfileSaved.jsx"));
+const ProfilePosts = lazy(() => import("./page/profile/Posts/ProfilePosts.jsx"));
+const ProfileTagged = lazy(() => import("./page/profile/Tagged/ProfileTagged.jsx"));
+const ProfileAllPosts = lazy(() => import("./page/profile/Saved/ProfileAllPosts.jsx"));
+const Register = lazy(() => import("./page/auth/Register.jsx"));
+const Settings = lazy(() => import("./page/edit/Settings.jsx"));
+const EditProfile = lazy(() => import("./page/edit/EditProfile.jsx"));
+const Notifications = lazy(() => import("./page/edit/Notifications/Notifications.jsx"));
+const PushNotifications = lazy(() => import("./page/edit/Notifications/PushNotifications"));
+const PostModalWrapper = lazy(() => import("./components/posts/PostModalWrapper.jsx"));
+const PostDetailPage = lazy(() => import("./page/post/PostDetailPage.jsx"));
 
 document.documentElement.classList.add("dark");
 
@@ -33,7 +34,13 @@ const AppRoutes = () => {
   const backgroundLocation = state && state.backgroundLocation;
 
   return (
-    <>
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen bg-black">
+          <div className="w-10 h-10 border-4 border-t-[#0095f6] border-zinc-750 rounded-full animate-spin"></div>
+        </div>
+      }
+    >
       <Routes location={backgroundLocation || location}>
         <Route path="/" element={<App />}>
           <Route
@@ -84,7 +91,7 @@ const AppRoutes = () => {
           <Route path="/p/:id" element={<PostModalWrapper />} />
         </Routes>
       )}
-    </>
+    </Suspense>
   );
 };
 

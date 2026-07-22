@@ -26,4 +26,6 @@ const commentSchema = new mongoose.Schema(
   },
 );
 
+commentSchema.index({ post: 1, createdAt: 1 });
+
 module.exports = mongoose.model("Comment", commentSchema);

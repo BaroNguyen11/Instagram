@@ -16,6 +16,7 @@ const userRoutes = require("./routes/userRoutes");
 const profileRoutes = require("./routes/profileRoutes");
 const notificationsRoutes = require("./routes/notificationRoute");
 const messageRoutes = require("./routes/messageRoutes");
+const storyRoutes = require("./routes/storyRoutes");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -32,6 +33,7 @@ app.use("/users", userRoutes);
 app.use("/profile", profileRoutes);
 app.use("/notifications", notificationsRoutes);
 app.use("/messages", messageRoutes);
+app.use("/stories", storyRoutes);
 
 // Global error handling middleware
 app.use((err, req, res, next) => {

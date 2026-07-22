@@ -12,6 +12,8 @@ import {
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import PostModalSend from "./PostModalSend";
+import useUsers from "@/hooks/useUsers";
 
 const PostImageCarousel = ({ images, caption }) => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -28,7 +30,10 @@ const PostImageCarousel = ({ images, caption }) => {
         style={{ transform: `translate3d(-${activeIndex * 100}%, 0, 0)` }}
       >
         {images.map((img, idx) => (
-          <div key={idx} className="min-w-full h-full shrink-0 flex items-center justify-center bg-zinc-900">
+          <div
+            key={idx}
+            className="min-w-full h-full shrink-0 flex items-center justify-center bg-zinc-900"
+          >
             <img
               src={img.url}
               alt={`${caption || "post"} ${idx}`}
@@ -70,9 +75,10 @@ const PostImageCarousel = ({ images, caption }) => {
           {images.map((_, idx) => (
             <span
               key={idx}
-              className={`w-1.5 h-1.5 rounded-full transition-all ${
-                idx === activeIndex ? "bg-[#0095f6] scale-110" : "bg-gray-400/60"
-              }`}
+              className={`w-1.5 h-1.5 rounded-full transition-all ${idx === activeIndex
+                  ? "bg-[#0095f6] scale-110"
+                  : "bg-gray-400/60"
+                }`}
             />
           ))}
         </div>
@@ -84,6 +90,8 @@ const Posts = ({ posts, refetchPosts, page, setPage, hasMore, loading }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [openMenu, setOpenMenu] = useState(null);
+  const [openSend, setOpenSend] = useState(false);
+  const { users } = useUsers();
   const likingRef = useRef({});
   const savedRef = useRef({});
   const [postList, setPostList] = useState(posts);
@@ -101,7 +109,7 @@ const Posts = ({ posts, refetchPosts, page, setPage, hasMore, loading }) => {
       },
       {
         rootMargin: "100px",
-      }
+      },
     );
 
     const currentTarget = observerTarget.current;
@@ -171,10 +179,10 @@ const Posts = ({ posts, refetchPosts, page, setPage, hasMore, loading }) => {
       prev.map((post) =>
         post._id === id
           ? {
-              ...post,
-              liked: !post.liked,
-              likeCount: post.liked ? post.likeCount - 1 : post.likeCount + 1,
-            }
+            ...post,
+            liked: !post.liked,
+            likeCount: post.liked ? post.likeCount - 1 : post.likeCount + 1,
+          }
           : post,
       ),
     );
@@ -183,7 +191,9 @@ const Posts = ({ posts, refetchPosts, page, setPage, hasMore, loading }) => {
       setPostList((prev) =>
         prev.map((post) => (post._id === id ? updated : post)),
       );
-      window.dispatchEvent(new CustomEvent("post-updated", { detail: updated }));
+      window.dispatchEvent(
+        new CustomEvent("post-updated", { detail: updated }),
+      );
     } catch (err) {
       setPostList((prev) =>
         prev.map((post) => (post._id === id ? oldPost : post)),
@@ -203,9 +213,9 @@ const Posts = ({ posts, refetchPosts, page, setPage, hasMore, loading }) => {
       prev.map((post) =>
         post._id === id
           ? {
-              ...post,
-              saved: !post.saved,
-            }
+            ...post,
+            saved: !post.saved,
+          }
           : post,
       ),
     );
@@ -215,7 +225,9 @@ const Posts = ({ posts, refetchPosts, page, setPage, hasMore, loading }) => {
       setPostList((prev) =>
         prev.map((post) => (post._id === id ? updated : post)),
       );
-      window.dispatchEvent(new CustomEvent("post-updated", { detail: updated }));
+      window.dispatchEvent(
+        new CustomEvent("post-updated", { detail: updated }),
+      );
     } catch {
       setPostList((prev) =>
         prev.map((post) => (post._id === id ? oldPost : post)),
@@ -232,7 +244,10 @@ const Posts = ({ posts, refetchPosts, page, setPage, hasMore, loading }) => {
           <div key={post._id} className="mb-7">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Link to={`/users/${post.author._id}`} className="flex items-center gap-2 hover:underline">
+                <Link
+                  to={`/users/${post.author._id}`}
+                  className="flex items-center gap-2 hover:underline"
+                >
                   <img
                     src={post.author.avatar}
                     alt=""
@@ -275,7 +290,11 @@ const Posts = ({ posts, refetchPosts, page, setPage, hasMore, loading }) => {
             </div>
             <div
               className="mt-4 bg-zinc-900 rounded-md overflow-hidden h-80 sm:h-96 md:h-128 cursor-pointer"
-              onClick={() => navigate(`/p/${post._id}`, { state: { backgroundLocation: location } })}
+              onClick={() =>
+                navigate(`/p/${post._id}`, {
+                  state: { backgroundLocation: location },
+                })
+              }
             >
               <PostImageCarousel images={post.images} caption={post.caption} />
             </div>
@@ -298,16 +317,30 @@ const Posts = ({ posts, refetchPosts, page, setPage, hasMore, loading }) => {
                   <MessageCircle
                     size={24}
                     className={iconHover}
-                    onClick={() => navigate(`/p/${post._id}`, { state: { backgroundLocation: location } })}
+                    onClick={() =>
+                      navigate(`/p/${post._id}`, {
+                        state: { backgroundLocation: location },
+                      })
+                    }
                   />
                   <span className="text-sm font-semibold">
                     {post.commentCount}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Send size={23} className={iconHover} />
-                  <span className="text-sm font-semibold">36k</span>
+                  <Send
+                    size={23}
+                    className={iconHover}
+                    onClick={() => setOpenSend(true)}
+                  />
                 </div>
+                {openSend && (
+                  <PostModalSend
+                    open={openSend}
+                    users={users}
+                    onClose={() => setOpenSend(false)}
+                  />
+                )}
               </div>
               <button onClick={() => handleSavePost(post._id)}>
                 <Bookmark
@@ -340,8 +373,12 @@ const Posts = ({ posts, refetchPosts, page, setPage, hasMore, loading }) => {
             <div className="w-12 h-12 rounded-full border border-zinc-800 flex items-center justify-center mb-1 text-[#0095f6] bg-zinc-950 shadow-inner">
               ✓
             </div>
-            <div className="font-semibold text-zinc-300">Bạn đã xem hết tất cả bài viết</div>
-            <div className="text-xs text-zinc-500">Bạn đã cập nhật tất cả bài viết mới nhất</div>
+            <div className="font-semibold text-zinc-300">
+              Bạn đã xem hết tất cả bài viết
+            </div>
+            <div className="text-xs text-zinc-500">
+              Bạn đã cập nhật tất cả bài viết mới nhất
+            </div>
           </div>
         )}
       </div>

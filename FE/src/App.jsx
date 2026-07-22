@@ -3,7 +3,7 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import usePost from "./hooks/usePost";
 import toast, { Toaster } from "react-hot-toast";
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { socket } from "./socket/socket";
 import { useAuth } from "./context/AuthContext";
 
@@ -40,9 +40,8 @@ function App() {
       toast.custom(
         (t) => (
           <div
-            className={`${
-              t.visible ? "animate-enter" : "animate-leave"
-            } max-w-sm w-full bg-[#1c1c1e] border border-zinc-700 rounded-2xl shadow-xl pointer-events-auto flex items-center gap-3 p-4`}
+            className={`${t.visible ? "animate-enter" : "animate-leave"
+              } max-w-sm w-full bg-[#1c1c1e] border border-zinc-700 rounded-2xl shadow-xl pointer-events-auto flex items-center gap-3 p-4`}
           >
             <img
               src={data.sender.avatar}
@@ -94,9 +93,17 @@ function App() {
         </aside>
 
         <main className="flex-1 min-w-0 ml-0 md:ml-25 pb-20 md:pb-0">
-          <Outlet
-            context={{ posts, refetchPosts, page, setPage, hasMore, loading }}
-          />
+          <Suspense
+            fallback={
+              <div className="flex-1 flex items-center justify-center min-h-[80vh] bg-black">
+                <div className="w-8 h-8 border-2 border-t-[#0095f6] border-zinc-700 rounded-full animate-spin"></div>
+              </div>
+            }
+          >
+            <Outlet
+              context={{ posts, refetchPosts, page, setPage, hasMore, loading }}
+            />
+          </Suspense>
         </main>
       </div>
     </>
