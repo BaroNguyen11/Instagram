@@ -1,5 +1,5 @@
 import { useOutletContext } from "react-router-dom";
-import Story from "../../components/Story";
+import Story from "../../components/story/Story";
 import useUsers from "../../hooks/useUsers";
 import Aside from "./Aside";
 import MainContent from "./MainContent";

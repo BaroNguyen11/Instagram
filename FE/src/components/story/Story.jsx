@@ -2,10 +2,12 @@ import useStory from "@/hooks/useStory";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import ModalUploadStory from "./ModalUploadStory";
+import ModalStory from "./ModalStory";
 
 const Story = () => {
-  const { story } = useStory();
-  const [openStory, setOpenStory] = useState(false);
+  const { story, refetch } = useStory();
+  const [openUploadStory, setOpenUploadStory] = useState(false);
+  const [activeStoryGroupIndex, setActiveStoryGroupIndex] = useState(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
@@ -13,8 +15,8 @@ const Story = () => {
   const imageStyle =
     " rounded-full object-cover bg-black cursor-pointer block transition-all duration-200 w-full h-full border-4 border-black";
   const storyStyle =
-    " p-1 rounded-full w-24 h-24 shrink-0 flex items-center justify-center ";
-  const nameStyle = "text-xs mt-1 text-gray-400 truncate w-20 text-center ";
+    " p-1 rounded-full w-24 h-24 shrink-0 flex items-center justify-center cursor-pointer hover:scale-102 active:scale-98 transition-all duration-200";
+  const nameStyle = "text-xs mt-1 text-gray-400 truncate w-20 text-center select-none";
   const style = "flex flex-col items-center min-w-[6rem]";
 
   const scrollRef = useRef();
@@ -69,7 +71,7 @@ const Story = () => {
         >
           <div className="flex flex-col items-center min-w-24">
             <div
-              onClick={() => setOpenStory(true)}
+              onClick={() => setOpenUploadStory(true)}
               className="p-1 rounded-full w-24 h-24 shrink-0 flex items-center justify-center bg-[#3a3a3a] cursor-pointer hover:scale-101 transition"
             >
               <div className="w-full h-full rounded-full bg-black flex items-center justify-center">
@@ -83,15 +85,16 @@ const Story = () => {
             </div>
 
             <span className="text-xs mt-1 text-gray-400 truncate w-20 text-center">
-              Your story
+              Add story
             </span>
           </div>
-          {story.map((item) => (
-            <div className={style} key={item.id}>
+          {story.map((item, idx) => (
+            <div className={style} key={item.user?._id || idx}>
               <div
-                className={` ${storyStyle} ${item.active ? "bg-linear-[45deg] from-[#f6ff00] via-[#f15130] to-[#ca09bf]" : "bg-[#3a3a3a]"}`}
+                onClick={() => setActiveStoryGroupIndex(idx)}
+                className={` ${storyStyle} ${!item.hasSeen ? "bg-linear-[45deg] from-[#f6ff00] via-[#f15130] to-[#ca09bf]" : "bg-[#3a3a3a]"}`}
               >
-                <img src={item?.stories[0]?.user?.avatar} alt="" className={imageStyle} />
+                <img src={item?.user?.avatar || item?.stories[0]?.user?.avatar} alt="" className={imageStyle} />
               </div>
               <span className={nameStyle}>{item?.user?.username}</span>
             </div>
@@ -106,7 +109,20 @@ const Story = () => {
           </div>
         )}
       </div>
-      {openStory && <ModalUploadStory onClose={() => setOpenStory(false)} />}
+      {openUploadStory && (
+        <ModalUploadStory
+          onClose={() => setOpenUploadStory(false)}
+          refetch={refetch}
+        />
+      )}
+      {activeStoryGroupIndex !== null && (
+        <ModalStory
+          storiesGroupList={story}
+          initialGroupIndex={activeStoryGroupIndex}
+          onClose={() => setActiveStoryGroupIndex(null)}
+          refetch={refetch}
+        />
+      )}
     </>
   );
 };

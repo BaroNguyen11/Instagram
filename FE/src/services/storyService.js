@@ -14,4 +14,8 @@ export const storyService = {
     const response = await apiClient.get(`/stories`);
     return response.data;
   },
+  seenStory: async (storyId) => {
+    const response = await apiClient.patch(`/stories/${storyId}/view`);
+    return response.data;
+  },
 };

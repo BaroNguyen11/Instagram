@@ -36,10 +36,15 @@ const storySchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-
+    views: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
     duration: {
       type: Number,
-      default: 15,
+      default: 100,
     },
 
     expiresAt: {

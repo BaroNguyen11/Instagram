@@ -14,8 +14,8 @@ const createStory = async (req, res) => {
       r2Service.uploadToR2(
         file,
         process.env.R2_BUCKET_STR,
-        process.env.R2_PUBLIC_URL_STORY
-      )
+        process.env.R2_PUBLIC_URL_STORY,
+      ),
     );
 
     const uploadedMedia = await Promise.all(uploadPromises);
@@ -26,7 +26,7 @@ const createStory = async (req, res) => {
         media,
         content: req.body.content || "",
         duration: req.body.duration || 15,
-      }))
+      })),
     );
 
     return res.status(201).json(stories);
@@ -67,9 +67,17 @@ const getStory = async (req, res) => {
         groupedStories[id] = {
           user: story.user,
           stories: [],
+          hasSeen: true,
         };
       }
 
+      const seen = story.views.some(
+        (v) => v.toString() === req.user._id.toString(),
+      );
+
+      if (!seen) {
+        groupedStories[id].hasSeen = false;
+      }
       groupedStories[id].stories.push(story);
     });
 
@@ -80,7 +88,30 @@ const getStory = async (req, res) => {
     });
   }
 };
+
+const seenStory = async (req, res) => {
+  const story = await Story.findById(req.params.id);
+  if (!story) {
+    return res.status(400).json({
+      message: "Story not found",
+    });
+  }
+
+  const viewed = story.views.some(
+    (id) => id.toString() === req.user._id.toString(),
+  );
+
+  if (!viewed) {
+    story.views.push(req.user._id);
+    story.viewCount += 1;
+    await story.save();
+  }
+  res.json({
+    success: true,
+  });
+};
 module.exports = {
   createStory,
   getStory,
+  seenStory,
 };
